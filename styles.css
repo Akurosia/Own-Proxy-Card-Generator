@@ -1,4 +1,4 @@
-/* Stream Saga – Front Generator (v4 full) */
+/* Stream Saga – Front Generator (v5 full) */
 
 :root {
   --bg: #0b0f12;
@@ -163,7 +163,7 @@ button:hover { border-color: #293544; }
 .title { display: flex; gap: var(--s-2); justify-content: center; }
 #titleName { font: 700 30px var(--font-display); color: #cfe8ff; }
 #titleMod {
-  font: 800 18px var(--font-display);
+  font: 800 24px var(--font-display); /* 24px as requested */
   padding: 2px 8px;
   border: 1px solid #182029;
   border-radius: 8px;
@@ -231,6 +231,7 @@ button:hover { border-color: #293544; }
   position:absolute; left:22px; right:22px; bottom: calc(60px + 12px);
   padding: var(--s-3);
   font-style: italic;
+  text-align: center; /* centered as requested */
   border-left: 3px solid #1d2a34;
   background: #0e1318;
   border-radius: 10px;
@@ -247,7 +248,7 @@ button:hover { border-color: #293544; }
   z-index:2;
 }
 .card-credit .credit-left{display:flex; align-items:center; gap:10px}
-.card-credit .credit-left img{display:none; width:24px; height:24px; object-fit:contain; filter:drop-shadow(0 0 4px rgba(57,184,255,.25))}
+.card-credit .credit-left img{display:none; width:28px; height:28px; object-fit:contain; filter:drop-shadow(0 0 4px rgba(57,184,255,.25))}
 .card-credit .credit-left span{font:700 12px var(--font-display); color:#cfe4ff}
 .card-credit .credit-center{text-align:center}
 .card-credit .credit-right{display:flex; align-items:center; gap:10px; justify-self:end}

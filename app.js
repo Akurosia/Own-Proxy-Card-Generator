@@ -130,6 +130,7 @@ function drawCredit(){
   svg.innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
 }
 
+/* Robust export with fallback */
 async function downloadPNG(){
   const node=el("card");
 
@@ -137,38 +138,67 @@ async function downloadPNG(){
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
+  // ensure images loaded
+  const img = el("artImg");
+  if (img && img.src && !img.complete) {
+    await new Promise(res=>img.addEventListener("load", res, {once:true}));
+  }
 
-  const rect = node.getBoundingClientRect();
-  // html2canvas sometimes returns blank when foreignObjectRendering is true.
-  html2canvas(node, {
-    backgroundColor: null,
-    scale: 2,
-    width: Math.round(rect.width),
-    height: Math.round(rect.height),
-    useCORS: false,
-    allowTaint: true,
-    foreignObjectRendering: false,
-    logging: false,
-    scrollX: 0,
-    scrollY: 0,
-    onclone: (doc) => {
-      // ensure cloned node keeps variable-driven gradient
-      const clonedCard = doc.getElementById("card");
-      if (clonedCard) {
-        const cs = getComputedStyle(el("card"));
-        clonedCard.style.setProperty("--bg-top", cs.getPropertyValue("--bg-top") || "#0a0d10");
-        clonedCard.style.setProperty("--bg-bottom", cs.getPropertyValue("--bg-bottom") || "#0b0f12");
+  // compute and stamp resolved background into clone so CSS vars don't break
+  const cs = getComputedStyle(node);
+  const resolvedBg = cs.backgroundImage || cs.background;
+
+  async function tryRender(options){
+    const rect = node.getBoundingClientRect();
+    return html2canvas(node, Object.assign({
+      backgroundColor: null,
+      scale: 2,
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+      useCORS: true,
+      allowTaint: true,
+      foreignObjectRendering: false,
+      removeContainer: true,
+      scrollX: 0,
+      scrollY: 0,
+      onclone: (doc) => {
+        const clonedCard = doc.getElementById("card");
+        if (clonedCard) {
+          clonedCard.style.backgroundImage = resolvedBg;
+          // also ensure inner panel exists with same styles
+          const inner = clonedCard.querySelector(".card-inner");
+          if(inner){
+            inner.style.opacity = "0.25";
+          }
+        }
       }
+    }, options));
+  }
+
+  let canvas = await tryRender({foreignObjectRendering:false}).catch(()=>null);
+  // fallback attempt
+  if (!canvas || canvas.width===0 || canvas.height===0) {
+    canvas = await tryRender({foreignObjectRendering:true}).catch(()=>null);
+  }
+  // safety: if canvas still blank or tainted, notify
+  if (!canvas) {
+    alert("Export failed. Try adding an image and try again.");
+    return;
+  }
+
+  try{
+    const ctx = canvas.getContext("2d");
+    const sample = ctx.getImageData(0,0,1,1).data;
+    // if fully transparent, try the other mode once more
+    if(sample[3]===0){
+      canvas = await tryRender({foreignObjectRendering:!false}).catch(()=>canvas);
     }
-  }).then(canvas=>{
-    const link=document.createElement("a");
-    link.download=(state.name||"card")+".png";
-    link.href=canvas.toDataURL("image/png");
-    link.click();
-  }).catch(err=>{
-    console.error("Export error:", err);
-    alert("Export failed. Try again after adding an image or data.");
-  });
+  }catch(e){ /* ignore */ }
+
+  const link=document.createElement("a");
+  link.download=(state.name||"card")+".png";
+  link.href=canvas.toDataURL("image/png");
+  link.click();
 }
 
 function resetForm(){
