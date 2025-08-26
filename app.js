@@ -26,9 +26,9 @@ function bindInputs(){
     ["abilityName","input", v => { state.abilityName=v; drawAbility(); }],
     ["abilityText","input", v => { state.abilityText=v; drawAbility(); }],
     ["flavour","input", v => { state.flavour=v; drawFlavour(); }],
-    ["numXY","input", v => { state.numXY=v; drawFooter(); }],
-    ["setName","input", v => { state.setName=v; drawFooter(); }],
-    ["rarity","change", v => { state.rarity=v; drawFooter(); }],
+    ["numXY","input", v => { state.numXY=v; drawCredit(); }],
+    ["setName","input", v => { state.setName=v; drawCredit(); }],
+    ["rarity","change", v => { state.rarity=v; drawCredit(); }],
     ["youtube","input", v => { state.youtube=v; drawSocials(); }],
     ["twitch","input", v => { state.twitch=v; drawSocials(); }],
     ["instagram","input", v => { state.instagram=v; drawSocials(); }],
@@ -40,11 +40,11 @@ function bindInputs(){
   // files
   el("mainImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.artURL=url; drawArt(); }));
   el("prevImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.prevURL=url; drawStage(); }));
-  el("setIcon").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.setIconURL=url; drawFooter(); }));
+  el("setIcon").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.setIconURL=url; drawCredit(); }));
 
   // background colors
-  el("bgTop").addEventListener("input", e=>{ document.getElementById("card").style.setProperty("--bg-top", e.target.value); });
-  el("bgBottom").addEventListener("input", e=>{ document.getElementById("card").style.setProperty("--bg-bottom", e.target.value); });
+  el("bgTop").addEventListener("input", e=>{ el("card").style.setProperty("--bg-top", e.target.value); });
+  el("bgBottom").addEventListener("input", e=>{ el("card").style.setProperty("--bg-bottom", e.target.value); });
 
   el("downloadBtn").addEventListener("click", downloadPNG);
   el("resetBtn").addEventListener("click", resetForm);
@@ -112,39 +112,63 @@ function drawAbility(){
 function drawFlavour(){
   el("flavourText").textContent=state.flavour||"";
 }
-
-function drawFooter(){
+function drawCredit(){
   el("setNameText").textContent=state.setName||"";
   el("numOut").textContent=state.numXY||"";
 
-  const icon=el("setIconImg");
+  const icon=document.getElementById("setIconImg");
   if(state.setIconURL){ icon.src=state.setIconURL; icon.style.display="inline-block"; }
   else { icon.removeAttribute("src"); icon.style.display="none"; }
 
   // rarity
-  const rarityBox=document.querySelector(".rarity");
+  const rarityBox=document.querySelector(".card-credit .rarity");
   rarityBox.className="rarity "+(state.rarity||"common");
-  const svg=el("rarityIcon");
-  // star icon
+  const svg=document.getElementById("rarityIcon");
   svg.innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
 }
 
-function downloadPNG(){
+async function downloadPNG(){
   const node=el("card");
-  html2canvas(node,{backgroundColor:null,scale:2,width:node.offsetWidth,height:node.offsetHeight})
-    .then(canvas=>{
-      const link=document.createElement("a");
-      link.download=(state.name||"card")+".png";
-      link.href=canvas.toDataURL("image/png");
-      link.click();
-    });
+
+  // ensure fonts are ready
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+
+  // temporarily force a solid background to avoid transparency mismatches if needed
+  const prevBg = node.style.backgroundColor;
+  // node.style.backgroundColor = getComputedStyle(document.body).backgroundColor;
+
+  const rect = node.getBoundingClientRect();
+  html2canvas(node, {
+    backgroundColor: null,
+    scale: 2,
+    width: Math.round(rect.width),
+    height: Math.round(rect.height),
+    useCORS: true,
+    allowTaint: true,
+    foreignObjectRendering: true,
+    logging: false,
+    scrollX: 0,
+    scrollY: 0
+  }).then(canvas=>{
+    const link=document.createElement("a");
+    link.download=(state.name||"card")+".png";
+    link.href=canvas.toDataURL("image/png");
+    link.click();
+    node.style.backgroundColor = prevBg;
+  }).catch(err=>{
+    console.error(err);
+    node.style.backgroundColor = prevBg;
+  });
 }
+
 function resetForm(){
   Object.keys(state).forEach(k=>state[k]="");
   state.element="calm"; state.stage="base"; state.rarity="common";
-  drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAttack(); drawAbility(); drawFlavour(); drawFooter();
+  drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAttack(); drawAbility(); drawFlavour(); drawCredit();
 }
 
 /* init */
 bindInputs();
-drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAttack(); drawAbility(); drawFlavour(); drawFooter();
+drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAttack(); drawAbility(); drawFlavour(); drawCredit();

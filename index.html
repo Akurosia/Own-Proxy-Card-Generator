@@ -144,6 +144,9 @@
     <!-- Card Preview -->
     <section class="canvasZone">
       <div class="card" id="card">
+        <!-- Real inner panel (not pseudo) to ensure export parity -->
+        <div class="card-inner" aria-hidden="true"></div>
+
         <div class="frame">
           <div class="frame-corner tl"></div>
           <div class="frame-corner tr"></div>
@@ -194,15 +197,21 @@
           <div class="aa-head"><span id="attackTitle"></span><span class="value" id="attackVal"></span></div>
         </section>
 
+        <!-- Flavour aligned to bottom, just above card-credit -->
         <p class="card-flavour" id="flavourText"></p>
 
-        <footer class="card-footer">
-          <div class="set"><img id="setIconImg" alt=""><span id="setNameText"></span></div>
-          <div class="rarity"><svg id="rarityIcon" viewBox="0 0 24 24"></svg></div>
-          <div id="numOut"></div>
-        </footer>
+        <!-- Bottom credit bar now also hosts set left, number+rarity right -->
+        <div class="card-credit">
+          <div class="credit-left">
+            <img id="setIconImg" alt=""><span id="setNameText"></span>
+          </div>
+          <div class="credit-center">Created by <strong>Akurosia Kamo</strong> &amp; <strong>Evidiya</strong></div>
+          <div class="credit-right">
+            <span id="numOut"></span>
+            <span class="rarity"><svg id="rarityIcon" viewBox="0 0 24 24"></svg></span>
+          </div>
+        </div>
 
-        <div class="card-credit">Created by <strong>Akurosia Kamo</strong> &amp; <strong>Evidiya</strong></div>
       </div>
       <div class="exportNote">What you see is what gets exported.</div>
     </section>
