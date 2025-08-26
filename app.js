@@ -31,12 +31,17 @@ function loadScript(src){
 }
 async function ensureExportLibs(){
   if(!window.htmlToImage){
-    await loadScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js');
-  }
+    try {
+        await loadScript('html-to-image.js');
+    } catch{}
+}
   if(!window.domtoimage){
-    await loadScript('https://cdn.jsdelivr.net/npm/dom-to-image-more@3.3.7/dist/dom-to-image-more.min.js');
+    try {
+        await loadScript('dom-to-image-more.js');
+    } catch{}
   }
 }
+
 
 /* --- Bind inputs and draw functions --- */
 function bindInputs(){
