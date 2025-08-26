@@ -1,3 +1,7 @@
+/* Stream Saga – Front Generator (v6 JS only)
+   New export approach using html-to-image with dom-to-image-more fallback.
+*/
+
 const el = id => document.getElementById(id);
 
 const state = {
@@ -15,6 +19,25 @@ const state = {
   artURL: "", prevURL: "", setIconURL: ""
 };
 
+/* --- Helpers to load libraries on demand --- */
+function loadScript(src){
+  return new Promise((resolve, reject)=>{
+    if (document.querySelector('script[src="'+src+'"]')) return resolve();
+    const s=document.createElement('script');
+    s.src=src; s.async=true; s.onload=resolve; s.onerror=()=>reject(new Error('Failed to load '+src));
+    document.head.appendChild(s);
+  });
+}
+async function ensureExportLibs(){
+  if(!window.htmlToImage){
+    await loadScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js');
+  }
+  if(!window.domtoimage){
+    await loadScript('https://cdn.jsdelivr.net/npm/dom-to-image-more@3.3.7/dist/dom-to-image-more.min.js');
+  }
+}
+
+/* --- Bind inputs and draw functions --- */
 function bindInputs(){
   const map = [
     ["name","input", v => { state.name=v; drawText(); }],
@@ -35,20 +58,32 @@ function bindInputs(){
     ["instagram","input", v => { state.instagram=v; drawSocials(); }],
   ];
   map.forEach(([id,ev,fn])=>{
-    el(id).addEventListener(ev, e=>fn(e.target.value));
+    const n = document.getElementById(id);
+    if(n) n.addEventListener(ev, e=>fn(e.target.value));
   });
 
   // files
-  el("mainImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.artURL=url; drawArt(); }));
-  el("prevImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.prevURL=url; drawStage(); }));
-  el("setIcon").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.setIconURL=url; drawCredit(); }));
+  const files = [
+    ["mainImg", url=>{ state.artURL=url; drawArt(); }],
+    ["prevImg", url=>{ state.prevURL=url; drawStage(); }],
+    ["setIcon", url=>{ state.setIconURL=url; drawCredit(); }]
+  ];
+  files.forEach(([id,cb])=>{
+    const n=document.getElementById(id);
+    if(!n) return;
+    n.addEventListener("change", e => loadFile(e.target.files[0], cb));
+  });
 
   // background colors
-  el("bgTop").addEventListener("input", e=>{ el("card").style.setProperty("--bg-top", e.target.value); });
-  el("bgBottom").addEventListener("input", e=>{ el("card").style.setProperty("--bg-bottom", e.target.value); });
+  const bgTop = document.getElementById("bgTop");
+  const bgBottom = document.getElementById("bgBottom");
+  if(bgTop) bgTop.addEventListener("input", e=>{ document.getElementById("card").style.setProperty("--bg-top", e.target.value); });
+  if(bgBottom) bgBottom.addEventListener("input", e=>{ document.getElementById("card").style.setProperty("--bg-bottom", e.target.value); });
 
-  el("downloadBtn").addEventListener("click", downloadPNG);
-  el("resetBtn").addEventListener("click", resetForm);
+  const dl=document.getElementById("downloadBtn");
+  if(dl) dl.addEventListener("click", downloadPNG);
+  const reset=document.getElementById("resetBtn");
+  if(reset) reset.addEventListener("click", resetForm);
 }
 
 function loadFile(file, cb){
@@ -59,22 +94,25 @@ function loadFile(file, cb){
 }
 
 function drawText(){
-  el("titleName").textContent = state.name || " ";
-  el("titleMod").textContent = state.nameMod || "";
+  const tn=el("titleName"); if(tn) tn.textContent = state.name || " ";
+  const tm=el("titleMod"); if(tm) tm.textContent = state.nameMod || "";
 }
 function drawElement(){
   const b = el("elementBadge");
+  if(!b) return;
   b.textContent = (state.element||"").toUpperCase();
   b.className = "badge element " + state.element;
 }
 function drawStage(){
-  el("stageText").textContent = state.stage==="base"?"Base":(state.stage==="step1"?"Step 1":"Step 2");
+  const st=el("stageText"); if(st) st.textContent = state.stage==="base"?"Base":(state.stage==="step1"?"Step 1":"Step 2");
   const thumb=el("prevThumb");
+  if(!thumb) return;
   if(state.stage!=="base" && state.prevURL){ thumb.src=state.prevURL; thumb.style.display="block"; }
   else{ thumb.removeAttribute("src"); thumb.style.display="none"; }
 }
 function drawArt(){
   const img=el("artImg");
+  if(!img) return;
   if(state.artURL){ img.src=state.artURL; img.style.display="block"; }
   else{ img.removeAttribute("src"); img.style.display="none"; }
 }
@@ -82,21 +120,24 @@ function drawSocials(){
   const pairs=[["ytName",state.youtube],["twName",state.twitch],["igName",state.instagram]];
   let any=false;
   pairs.forEach(([id,val])=>{
-    const n=el(id); n.textContent=val;
-    const visible = !!val.trim();
-    n.parentElement.style.display=visible?"flex":"none";
+    const n=el(id); if(!n) return;
+    n.textContent=val;
+    const visible = !!(val && val.trim());
+    const parent = n.parentElement;
+    if(parent) parent.style.display=visible?"flex":"none";
     if(visible) any=true;
   });
   const container = document.querySelector(".card-socials");
-  container.style.display = any ? "flex" : "none";
+  if(container) container.style.display = any ? "flex" : "none";
 }
 function drawAttack(){
   const box=document.querySelector(".card-attack");
-  const has = state.attackName.trim() || state.attackEffect.trim();
+  if(!box) return;
+  const has = (state.attackName && state.attackName.trim()) || (state.attackEffect && state.attackEffect.trim());
   if(has){
-    el("attackTitle").textContent=state.attackName;
-    el("attackVal").textContent=state.attackValue;
-    el("attackEffectText").textContent=state.attackEffect||"";
+    const t=el("attackTitle"); if(t) t.textContent=state.attackName||"";
+    const v=el("attackVal"); if(v) v.textContent=state.attackValue||"";
+    const e=el("attackEffectText"); if(e) e.textContent=state.attackEffect||"";
     box.style.display="block";
   } else {
     box.style.display="none";
@@ -104,103 +145,113 @@ function drawAttack(){
 }
 function drawAbility(){
   const box=document.querySelector(".card-ability");
-  if(state.abilityName.trim()){
-    el("abilityTitle").textContent=state.abilityName;
-    el("abilityDesc").textContent=state.abilityText;
+  if(!box) return;
+  if(state.abilityName && state.abilityName.trim()){
+    const t=el("abilityTitle"); if(t) t.textContent=state.abilityName;
+    const d=el("abilityDesc"); if(d) d.textContent=state.abilityText||"";
     box.style.display="block";
   } else {
     box.style.display="none";
   }
 }
-function drawFlavour(){
-  el("flavourText").textContent=state.flavour||"";
-}
+function drawFlavour(){ const f=el("flavourText"); if(f) f.textContent=state.flavour||""; }
 function drawCredit(){
-  el("setNameText").textContent=state.setName||"";
-  el("numOut").textContent=state.numXY||"";
+  const setN=el("setNameText"); if(setN) setN.textContent=state.setName||"";
+  const num=el("numOut"); if(num) num.textContent=state.numXY||"";
 
   const icon=document.getElementById("setIconImg");
-  if(state.setIconURL){ icon.src=state.setIconURL; icon.style.display="inline-block"; }
-  else { icon.removeAttribute("src"); icon.style.display="none"; }
+  if(icon){
+    if(state.setIconURL){ icon.src=state.setIconURL; icon.style.display="inline-block"; }
+    else { icon.removeAttribute("src"); icon.style.display="none"; }
+  }
 
-  // rarity
   const rarityBox=document.querySelector(".card-credit .rarity");
-  rarityBox.className="rarity "+(state.rarity||"common");
+  if(rarityBox) rarityBox.className="rarity "+(state.rarity||"common");
   const svg=document.getElementById("rarityIcon");
-  svg.innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
+  if(svg) svg.innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
 }
 
-/* Robust export with fallback */
+/* --- New export approach: html-to-image with fallback --- */
 async function downloadPNG(){
-  const node=el("card");
+  const card = el("card");
+  if(!card) return;
+
+  await ensureExportLibs();
 
   // wait for fonts
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
-  // ensure images loaded
-  const img = el("artImg");
-  if (img && img.src && !img.complete) {
-    await new Promise(res=>img.addEventListener("load", res, {once:true}));
-  }
+  // wait for images
+  const imgs = [el("artImg"), el("prevThumb"), el("setIconImg")].filter(Boolean);
+  await Promise.all(imgs.map(img => {
+    if (img.src && !img.complete) {
+      return new Promise(res=>img.addEventListener("load", res, {once:true}));
+    }
+  }));
 
-  // compute and stamp resolved background into clone so CSS vars don't break
-  const cs = getComputedStyle(node);
-  const resolvedBg = cs.backgroundImage || cs.background;
+  // inline CSS vars / background to prevent blank export
+  const prevVars = {
+    top: card.style.getPropertyValue("--bg-top"),
+    bottom: card.style.getPropertyValue("--bg-bottom"),
+    bgImg: card.style.backgroundImage
+  };
+  const cs = getComputedStyle(card);
+  const top = (cs.getPropertyValue("--bg-top") || "#0a0d10").trim();
+  const bottom = (cs.getPropertyValue("--bg-bottom") || "#0b0f12").trim();
+  card.style.setProperty("--bg-top", top);
+  card.style.setProperty("--bg-bottom", bottom);
+  card.style.backgroundImage = `linear-gradient(180deg, ${top}, ${bottom})`;
 
-  async function tryRender(options){
-    const rect = node.getBoundingClientRect();
-    return html2canvas(node, Object.assign({
-      backgroundColor: null,
-      scale: 2,
-      width: Math.round(rect.width),
-      height: Math.round(rect.height),
-      useCORS: true,
-      allowTaint: true,
-      foreignObjectRendering: false,
-      removeContainer: true,
-      scrollX: 0,
-      scrollY: 0,
-      onclone: (doc) => {
-        const clonedCard = doc.getElementById("card");
-        if (clonedCard) {
-          clonedCard.style.backgroundImage = resolvedBg;
-          // also ensure inner panel exists with same styles
-          const inner = clonedCard.querySelector(".card-inner");
-          if(inner){
-            inner.style.opacity = "0.25";
-          }
-        }
-      }
-    }, options));
-  }
-
-  let canvas = await tryRender({foreignObjectRendering:false}).catch(()=>null);
-  // fallback attempt
-  if (!canvas || canvas.width===0 || canvas.height===0) {
-    canvas = await tryRender({foreignObjectRendering:true}).catch(()=>null);
-  }
-  // safety: if canvas still blank or tainted, notify
-  if (!canvas) {
-    alert("Export failed. Try adding an image and try again.");
-    return;
-  }
+  const filename = (state.name || "card") + ".png";
 
   try{
-    const ctx = canvas.getContext("2d");
-    const sample = ctx.getImageData(0,0,1,1).data;
-    // if fully transparent, try the other mode once more
-    if(sample[3]===0){
-      canvas = await tryRender({foreignObjectRendering:!false}).catch(()=>canvas);
+    const dataUrl = await window.htmlToImage.toPng(card, {
+      pixelRatio: 2,
+      backgroundColor: null,
+      cacheBust: true,
+      skipFonts: false,
+      style: {},
+      filter: () => true
+    });
+    triggerDownload(dataUrl, filename);
+  } catch(err){
+    console.warn("html-to-image failed, falling back:", err);
+    try{
+      const dataUrl2 = await window.domtoimage.toPng(card, {
+        quality: 1,
+        bgcolor: "transparent",
+        height: card.offsetHeight,
+        width: card.offsetWidth,
+        style: {
+          "--bg-top": top,
+          "--bg-bottom": bottom,
+          "backgroundImage": `linear-gradient(180deg, ${top}, ${bottom})`
+        },
+        filter: () => true
+      });
+      triggerDownload(dataUrl2, filename);
+    }catch(err2){
+      console.error("Fallback export failed:", err2);
+      alert("Export failed. Try adding an image, then click Download again.");
     }
-  }catch(e){ /* ignore */ }
-
+  } finally {
+    // revert inline styles
+    if(prevVars.top) card.style.setProperty("--bg-top", prevVars.top); else card.style.removeProperty("--bg-top");
+    if(prevVars.bottom) card.style.setProperty("--bg-bottom", prevVars.bottom); else card.style.removeProperty("--bg-bottom");
+    if(prevVars.bgImg) card.style.backgroundImage = prevVars.bgImg; else card.style.removeProperty("background-image");
+  }
+}
+function triggerDownload(dataUrl, filename){
   const link=document.createElement("a");
-  link.download=(state.name||"card")+".png";
-  link.href=canvas.toDataURL("image/png");
+  link.download=filename;
+  link.href=dataUrl;
+  document.body.appendChild(link);
   link.click();
+  link.remove();
 }
 
+/* reset */
 function resetForm(){
   Object.keys(state).forEach(k=>state[k]="");
   state.element="calm"; state.stage="base"; state.rarity="common";
