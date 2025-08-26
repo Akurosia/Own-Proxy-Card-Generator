@@ -6,7 +6,7 @@ const state = {
   element: "calm",
   stage: "base",
   youtube: "", twitch: "", instagram: "",
-  attackName: "", attackValue: "", attackText:"",
+  attackName: "", attackValue: "", attackEffect:"",
   abilityName: "", abilityText: "",
   flavour: "",
   numXY: "",
@@ -21,10 +21,11 @@ function bindInputs(){
     ["nameMod","change", v => { state.nameMod=v; drawText(); }],
     ["element","change", v => { state.element=v; drawElement(); }],
     ["stage","change", v => { state.stage=v; drawStage(); }],
-    ["attackName","input", v => { state.attackName=v; drawAttack(); }],
-    ["attackValue","input", v => { state.attackValue=v; drawAttack(); }],
     ["abilityName","input", v => { state.abilityName=v; drawAbility(); }],
     ["abilityText","input", v => { state.abilityText=v; drawAbility(); }],
+    ["attackName","input", v => { state.attackName=v; drawAttack(); }],
+    ["attackValue","input", v => { state.attackValue=v; drawAttack(); }],
+    ["attackEffect","input", v => { state.attackEffect=v; drawAttack(); }],
     ["flavour","input", v => { state.flavour=v; drawFlavour(); }],
     ["numXY","input", v => { state.numXY=v; drawCredit(); }],
     ["setName","input", v => { state.setName=v; drawCredit(); }],
@@ -91,9 +92,11 @@ function drawSocials(){
 }
 function drawAttack(){
   const box=document.querySelector(".card-attack");
-  if(state.attackName.trim()){
+  const has = state.attackName.trim() || state.attackEffect.trim();
+  if(has){
     el("attackTitle").textContent=state.attackName;
     el("attackVal").textContent=state.attackValue;
+    el("attackEffectText").textContent=state.attackEffect||"";
     box.style.display="block";
   } else {
     box.style.display="none";
@@ -130,36 +133,41 @@ function drawCredit(){
 async function downloadPNG(){
   const node=el("card");
 
-  // ensure fonts are ready
+  // wait for fonts
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
 
-  // temporarily force a solid background to avoid transparency mismatches if needed
-  const prevBg = node.style.backgroundColor;
-  // node.style.backgroundColor = getComputedStyle(document.body).backgroundColor;
-
   const rect = node.getBoundingClientRect();
+  // html2canvas sometimes returns blank when foreignObjectRendering is true.
   html2canvas(node, {
     backgroundColor: null,
     scale: 2,
     width: Math.round(rect.width),
     height: Math.round(rect.height),
-    useCORS: true,
+    useCORS: false,
     allowTaint: true,
-    foreignObjectRendering: true,
+    foreignObjectRendering: false,
     logging: false,
     scrollX: 0,
-    scrollY: 0
+    scrollY: 0,
+    onclone: (doc) => {
+      // ensure cloned node keeps variable-driven gradient
+      const clonedCard = doc.getElementById("card");
+      if (clonedCard) {
+        const cs = getComputedStyle(el("card"));
+        clonedCard.style.setProperty("--bg-top", cs.getPropertyValue("--bg-top") || "#0a0d10");
+        clonedCard.style.setProperty("--bg-bottom", cs.getPropertyValue("--bg-bottom") || "#0b0f12");
+      }
+    }
   }).then(canvas=>{
     const link=document.createElement("a");
     link.download=(state.name||"card")+".png";
     link.href=canvas.toDataURL("image/png");
     link.click();
-    node.style.backgroundColor = prevBg;
   }).catch(err=>{
-    console.error(err);
-    node.style.backgroundColor = prevBg;
+    console.error("Export error:", err);
+    alert("Export failed. Try again after adding an image or data.");
   });
 }
 

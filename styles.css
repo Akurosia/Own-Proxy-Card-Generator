@@ -1,4 +1,4 @@
-/* Stream Saga – Front Generator (v3 full) */
+/* Stream Saga – Front Generator (v4 full) */
 
 :root {
   --bg: #0b0f12;
@@ -115,7 +115,7 @@ button:hover { border-color: #293544; }
   background: linear-gradient(180deg, var(--bg-top, #0a0d10), var(--bg-bottom, #0b0f12));
 }
 
-/* Real inner panel for export parity (was ::before) */
+/* Real inner panel for export parity */
 .card-inner{
   position:absolute; inset:14px; border-radius:20px; z-index:0;
   border: 1px solid #171d24;
@@ -130,12 +130,10 @@ button:hover { border-color: #293544; }
   content:""; position:absolute; inset:0;
   border:2px solid; background:transparent;
 }
-/* Place corners */
 .frame-corner.tl{top:0; left:0}
 .frame-corner.tr{top:0; right:0}
 .frame-corner.bl{bottom:0; left:0}
 .frame-corner.br{bottom:0; right:0}
-/* Color only the two visible sides; set specific border-radius=26px for that corner */
 .frame-corner.tl::before{border-color: var(--red) transparent transparent var(--red); border-radius:26px 0 0 0;}
 .frame-corner.tr::before{border-color: var(--blue) var(--blue) transparent transparent; border-radius:0 26px 0 0;}
 .frame-corner.br::before{border-color: transparent var(--red) var(--red) transparent; border-radius:0 0 26px 0;}
@@ -206,6 +204,7 @@ button:hover { border-color: #293544; }
 
 /* Ability + Attack */
 .card-ability, .card-attack {
+  position:relative; z-index:2;
   margin: var(--s-3) var(--s-6) 0;
   padding: var(--s-2) var(--s-3);
   border: 1px solid #141b22;
@@ -213,7 +212,8 @@ button:hover { border-color: #293544; }
   background: #0f1419;
   display: none; /* hidden if empty */
 }
-.aa-head { display:flex; gap: var(--s-3); align-items:center; justify-content:space-between; color:#cfe8ff; }
+.aa-head { display:flex; gap: var(--s-2); align-items:center; justify-content:flex-start; color:#cfe8ff; }
+.aa-title { font:700 16px var(--font-display); }
 .ability-flag {
   display:inline-flex; align-items:center; gap:6px;
   padding:2px 8px; border-radius:8px;
@@ -223,7 +223,7 @@ button:hover { border-color: #293544; }
   text-transform:uppercase; letter-spacing:.6px;
   box-shadow: 0 0 8px rgba(57,184,255,.18), inset 0 0 8px rgba(255,59,59,.08);
 }
-.card-attack .value { font:800 18px var(--font-display); color:#ffd8d8; }
+.card-attack .value { margin-left:auto; font:800 18px var(--font-display); color:#ffd8d8; }
 .card-ability p, .card-attack p { margin:6px 0 0; color:#b1c6d9; font:400 13px var(--font-ui); }
 
 /* Flavour aligned to bottom just above card-credit */
@@ -234,6 +234,7 @@ button:hover { border-color: #293544; }
   border-left: 3px solid #1d2a34;
   background: #0e1318;
   border-radius: 10px;
+  z-index:2;
 }
 .card-flavour:empty { display:none; }
 
@@ -243,9 +244,11 @@ button:hover { border-color: #293544; }
   display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px;
   color:#6a7c8f; font:700 11px var(--font-display);
   border-top:1px solid #151c23; padding-top:8px;
+  z-index:2;
 }
-.card-credit .credit-left{display:flex; align-items:center; gap:8px}
-.card-credit .credit-left img{display:none; width:18px; height:18px; object-fit:contain}
+.card-credit .credit-left{display:flex; align-items:center; gap:10px}
+.card-credit .credit-left img{display:none; width:24px; height:24px; object-fit:contain; filter:drop-shadow(0 0 4px rgba(57,184,255,.25))}
+.card-credit .credit-left span{font:700 12px var(--font-display); color:#cfe4ff}
 .card-credit .credit-center{text-align:center}
 .card-credit .credit-right{display:flex; align-items:center; gap:10px; justify-self:end}
 .card-credit .credit-right #numOut{color:#cfe4ff; font:700 12px var(--font-display)}

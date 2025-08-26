@@ -61,6 +61,18 @@
           <input id="mainImg" type="file" accept="image/*" />
         </label>
 
+        <!-- ABILITY (moved above attack) -->
+        <label class="col2">
+          Ability Name
+          <input id="abilityName" type="text" placeholder="e.g. Neon Shield" />
+        </label>
+
+        <label class="col2">
+          Ability Text
+          <textarea id="abilityText" rows="2" placeholder="Describe ability…"></textarea>
+        </label>
+
+        <!-- ATTACK -->
         <label>
           Attack Name
           <input id="attackName" type="text" placeholder="e.g. Circuit Peck" />
@@ -72,20 +84,17 @@
         </label>
 
         <label class="col2">
-          Ability Name
-          <input id="abilityName" type="text" placeholder="e.g. Neon Shield" />
+          Attack Effect
+          <textarea id="attackEffect" rows="2" placeholder="Describe the attack effect (optional)…"></textarea>
         </label>
 
-        <label class="col2">
-          Ability Text
-          <textarea id="abilityText" rows="2" placeholder="Describe ability…"></textarea>
-        </label>
-
+        <!-- FLAVOUR -->
         <label class="col2">
           Flavour Text
           <textarea id="flavour" rows="2" placeholder="Short lore or personality…"></textarea>
         </label>
 
+        <!-- FOOTER DATA -->
         <label>
           Card Number (X/Y)
           <input id="numXY" type="text" placeholder="e.g. 12/99" />
@@ -186,15 +195,16 @@
         </div>
 
         <section class="card-ability">
-          <div class="aa-head">
+          <div class="aa-head aa-ability">
             <span class="ability-flag">ABILITY</span>
-            <span id="abilityTitle"></span>
+            <span id="abilityTitle" class="aa-title"></span>
           </div>
           <p id="abilityDesc"></p>
         </section>
 
         <section class="card-attack">
-          <div class="aa-head"><span id="attackTitle"></span><span class="value" id="attackVal"></span></div>
+          <div class="aa-head"><span id="attackTitle" class="aa-title"></span><span class="value" id="attackVal"></span></div>
+          <p id="attackEffectText"></p>
         </section>
 
         <!-- Flavour aligned to bottom, just above card-credit -->
