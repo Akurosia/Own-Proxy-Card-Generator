@@ -79,10 +79,15 @@ function drawArt(){
 }
 function drawSocials(){
   const pairs=[["ytName",state.youtube],["twName",state.twitch],["igName",state.instagram]];
+  let any=false;
   pairs.forEach(([id,val])=>{
     const n=el(id); n.textContent=val;
-    n.parentElement.style.display=val.trim()?"flex":"none";
+    const visible = !!val.trim();
+    n.parentElement.style.display=visible?"flex":"none";
+    if(visible) any=true;
   });
+  const container = document.querySelector(".card-socials");
+  container.style.display = any ? "flex" : "none";
 }
 function drawAttack(){
   const box=document.querySelector(".card-attack");
