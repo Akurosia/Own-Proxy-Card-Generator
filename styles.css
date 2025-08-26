@@ -1,4 +1,5 @@
-/* Stream Saga – Front Generator (v6 CSS only) */
+/* Stream Saga – Front Generator (v6 CSS) */
+/* (Same as the previous v6 you downloaded) */
 
 :root {
   --bg: #0b0f12;
@@ -163,7 +164,7 @@ button:hover { border-color: #293544; }
 .title { display: flex; gap: var(--s-2); justify-content: center; }
 #titleName { font: 700 30px var(--font-display); color: #cfe8ff; }
 #titleMod {
-  font: 800 24px var(--font-display); /* 24px as requested */
+  font: 800 24px var(--font-display);
   padding: 2px 8px;
   border: 1px solid #182029;
   border-radius: 8px;
@@ -210,7 +211,7 @@ button:hover { border-color: #293544; }
   border: 1px solid #141b22;
   border-radius: 10px;
   background: #0f1419;
-  display: none; /* hidden if empty */
+  display: none;
 }
 .aa-head { display:flex; gap: var(--s-2); align-items:center; justify-content:flex-start; color:#cfe8ff; }
 .aa-title { font:700 16px var(--font-display); }
@@ -231,7 +232,7 @@ button:hover { border-color: #293544; }
   position:absolute; left:22px; right:22px; bottom: calc(60px + 12px);
   padding: var(--s-3);
   font-style: italic;
-  text-align: center; /* centered as requested */
+  text-align: center;
   border-left: 3px solid #1d2a34;
   background: #0e1318;
   border-radius: 10px;

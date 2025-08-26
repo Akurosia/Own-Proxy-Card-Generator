@@ -1,5 +1,6 @@
-/* Stream Saga – Front Generator (v6 JS only)
+/* Stream Saga – Card Front Generator (Repo)
    New export approach using html-to-image with dom-to-image-more fallback.
+   This project is vibe coded.
 */
 
 const el = id => document.getElementById(id);
@@ -178,11 +179,9 @@ async function downloadPNG(){
 
   await ensureExportLibs();
 
-  // wait for fonts
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
-  // wait for images
   const imgs = [el("artImg"), el("prevThumb"), el("setIconImg")].filter(Boolean);
   await Promise.all(imgs.map(img => {
     if (img.src && !img.complete) {
@@ -190,12 +189,7 @@ async function downloadPNG(){
     }
   }));
 
-  // inline CSS vars / background to prevent blank export
-  const prevVars = {
-    top: card.style.getPropertyValue("--bg-top"),
-    bottom: card.style.getPropertyValue("--bg-bottom"),
-    bgImg: card.style.backgroundImage
-  };
+  // inline CSS vars / gradient in case the library loses them
   const cs = getComputedStyle(card);
   const top = (cs.getPropertyValue("--bg-top") || "#0a0d10").trim();
   const bottom = (cs.getPropertyValue("--bg-bottom") || "#0b0f12").trim();
@@ -209,10 +203,7 @@ async function downloadPNG(){
     const dataUrl = await window.htmlToImage.toPng(card, {
       pixelRatio: 2,
       backgroundColor: null,
-      cacheBust: true,
-      skipFonts: false,
-      style: {},
-      filter: () => true
+      cacheBust: true
     });
     triggerDownload(dataUrl, filename);
   } catch(err){
@@ -227,8 +218,7 @@ async function downloadPNG(){
           "--bg-top": top,
           "--bg-bottom": bottom,
           "backgroundImage": `linear-gradient(180deg, ${top}, ${bottom})`
-        },
-        filter: () => true
+        }
       });
       triggerDownload(dataUrl2, filename);
     }catch(err2){
@@ -236,12 +226,10 @@ async function downloadPNG(){
       alert("Export failed. Try adding an image, then click Download again.");
     }
   } finally {
-    // revert inline styles
-    if(prevVars.top) card.style.setProperty("--bg-top", prevVars.top); else card.style.removeProperty("--bg-top");
-    if(prevVars.bottom) card.style.setProperty("--bg-bottom", prevVars.bottom); else card.style.removeProperty("--bg-bottom");
-    if(prevVars.bgImg) card.style.backgroundImage = prevVars.bgImg; else card.style.removeProperty("background-image");
+    // don't need to revert inline vars for a static page, but we could
   }
 }
+
 function triggerDownload(dataUrl, filename){
   const link=document.createElement("a");
   link.download=filename;

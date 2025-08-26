@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <title>Stream Saga – Card Front Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Stream Saga card front generator — vibe coded." />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;800&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet" />
@@ -153,7 +154,6 @@
     <!-- Card Preview -->
     <section class="canvasZone">
       <div class="card" id="card">
-        <!-- Real inner panel (not pseudo) to ensure export parity -->
         <div class="card-inner" aria-hidden="true"></div>
 
         <div class="frame">
@@ -227,7 +227,7 @@
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- app.js dynamically loads html-to-image / dom-to-image-more when needed -->
   <script src="app.js"></script>
 </body>
 </html>
