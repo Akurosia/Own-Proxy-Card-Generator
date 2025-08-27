@@ -73,6 +73,9 @@ function bindInputs(){
   el("downloadBtn").addEventListener("click", downloadPNG);
 }
 
+/* Toggle helpers */
+function show(elm, flag){ if(!elm) return; elm.style.display = flag ? "" : "none"; }
+
 function loadFile(file, cb){
   if(!file) return;
   const r=new FileReader();
@@ -106,17 +109,19 @@ const textColorMap = [
   ["c_flavour","c_flavourSw","#flavourText"],
   ["c_numXY","c_numXYSw","#numOut"],
   ["c_setName","c_setNameSw","#setNameText"],
+  // socials:
+  ["c_social_yt","c_social_ytSw","#ytName"],
+  ["c_social_tw","c_social_twSw","#twName"],
+  ["c_social_ig","c_social_igSw","#igName"],
 ];
 
 function initTextColorSwatches(){
   textColorMap.forEach(([inputId, swId, targetSel])=>{
     const input = el(inputId), sw = el(swId), target = document.querySelector(targetSel);
     if(!input || !sw || !target) return;
-    // derive current color
     const cur = toHex(getComputedStyle(target).color);
     input.value = cur;
     const box = sw.querySelector('.swatch'); if(box) box.style.background = cur;
-    // wire
     sw.addEventListener('click', ()=> input.click());
     input.addEventListener('input', ()=> {
       const val = input.value;
@@ -142,6 +147,10 @@ function setLayout(mode){
   card.classList.toggle("fullart", state.layout === "full");
   const sel = el("layoutMode");
   if (sel && sel.value !== state.layout) sel.value = state.layout;
+
+  // show BG pickers only in Standard layout
+  show(el("bgTopRow"), state.layout !== "full");
+  show(el("bgBottomRow"), state.layout !== "full");
 }
 
 /* Drawers */
@@ -150,7 +159,12 @@ function drawElement(){ const b=el("elementBadge"); b.textContent=(state.element
 function drawStage(){
   el("stageText").textContent = state.stage==="base"?"Base":(state.stage==="step1"?"Step 1":"Step 2");
   const t=el("prevThumb");
-  if(state.stage!=="base" && state.prevURL){ t.src=state.prevURL; t.style.display="block"; } else { t.removeAttribute("src"); t.style.display="none"; }
+  const row = el("prevImgRow");
+  const nonBase = state.stage !== "base";
+  show(row, nonBase);
+
+  if(nonBase && state.prevURL){ t.src=state.prevURL; t.style.display="block"; }
+  else { t.removeAttribute("src"); t.style.display="none"; }
 }
 function drawArt(){ const img=el("artImg"); if(state.artURL){ img.src=state.artURL; img.style.display="block"; } else { img.removeAttribute("src"); img.style.display="none"; } }
 function drawSocials(){
@@ -192,12 +206,37 @@ function drawAttack2(){
 }
 function drawFlavour(){ el("flavourText").textContent=state.flavour || ""; }
 function drawCredit(){
-  el("setNameText").textContent=state.setName||""; el("numOut").textContent=state.numXY||"";
-  const icon=el("setIconImg");
-  if(state.setIconURL){ icon.src=state.setIconURL; icon.style.display="inline-block"; } else { icon.removeAttribute("src"); icon.style.display="none"; }
-  const rb=document.querySelector(".card-credit .rarity");
-  rb.className="rarity "+(state.rarity||"common");
-  el("rarityIcon").innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
+  el("setNameText").textContent = state.setName || "";
+  el("numOut").textContent = state.numXY || "";
+
+  const iconImg = el("setIconImg");
+  if (state.setIconURL){ iconImg.src = state.setIconURL; iconImg.style.display = "inline-block"; }
+  else { iconImg.removeAttribute("src"); iconImg.style.display = "none"; }
+
+  const rarityWrap = document.querySelector(".card-credit .rarity");
+  const r = (state.rarity || "common");
+  rarityWrap.className = "rarity " + r;
+
+  // Different shapes per rarity
+  const rarityIcon = el("rarityIcon");
+  let svg = "";
+  switch(r){
+    case "common":   // circle
+      svg = '<circle cx="12" cy="12" r="7.5"/>';
+      break;
+    case "uncommon": // diamond
+      svg = '<path d="M12 3l7 9-7 9-7-9 7-9z"/>';
+      break;
+    case "rare":     // star
+      svg = '<path d="M12 2.5l3.1 6.3 7 1-5.1 5 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5.1-5 7-1L12 2.5z"/>';
+      break;
+    case "ultra":    // crown
+      svg = '<path d="M3 17h18v2H3v-2zM3 9l4 3 5-6 5 6 4-3v7H3V9z"/>';
+      break;
+    default:
+      svg = '<circle cx="12" cy="12" r="7.5"/>';
+  }
+  rarityIcon.innerHTML = svg;
 }
 
 /* utils */
@@ -337,5 +376,8 @@ function resetForm(){
 
 /* Init */
 bindInputs();
-setLayout("standard");
+setTimeout(()=>{ // ensure initial visibility correct on first load
+  drawStage();
+  setLayout(el("layoutMode")?.value || "standard");
+},0);
 drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();

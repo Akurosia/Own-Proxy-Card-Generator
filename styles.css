@@ -9,7 +9,7 @@
   --card-scale: 0.84;
 
   --panel-w-r: 320px;
-  --panel-w-l: 415px;
+  --panel-w-l: 455px;
 
   --radius-lg:28px; --radius-md:18px; --radius-sm:10px;
   --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-7:28px; --s-8:32px;
@@ -169,3 +169,33 @@ button:hover{border-color:#293544}
 
 /* Short screens */
 @media (max-height:900px){ :root{ --card-scale:0.78 } }
+
+/* Row types */
+.form-row{ width:100% }
+.form-row .lab{ color:#bcd0e2; font:700 12px var(--font-display) }
+.row-2{ display:grid; grid-template-columns: 140px 1fr; align-items:center; gap:10px }
+.row-3{ display:grid; grid-template-columns: 140px 1fr 40px; align-items:center; gap:10px }
+/* Social rows: ICON : LABEL : FIELD : COLOR */
+.socials{ border:1px solid #141a21; border-radius:12px; padding:12px }
+legend{ padding:0 6px; color:#bcd0e2; font:700 12px var(--font-display) }
+.social-row.row-4{ display:grid; grid-template-columns: 28px 110px 1fr 40px; align-items:center; gap:10px }
+.icon-sm{ width:20px; height:20px; opacity:.95 }
+
+/* Hidden native color + swatch */
+.hidden-color{
+  position:absolute !important; width:0 !important; height:0 !important;
+  opacity:0 !important; pointer-events:none !important; border:0 !important; padding:0 !important;
+}
+.swatch-btn{
+  width:28px; height:28px; border:1px solid #2a3541; border-radius:6px;
+  background:#0e1419; padding:0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.swatch-btn .swatch{ width:20px; height:20px; border-radius:4px; border:1px solid #2a3541 }
+.color-input.solo{ display:flex; align-items:center; gap:8px }
+input,select,textarea{
+  background:#0e1419;border:1px solid #141a21;border-radius:10px;padding:8px 10px;color:var(--ink)
+}
+textarea{
+  resize:vertical;
+  width:300px;      /* CHANGED */
+}

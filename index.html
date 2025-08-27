@@ -16,22 +16,17 @@
       <h1>Basics</h1>
 
       <div class="grid">
-        <!-- Name (LABEL : FIELD(with icon) : COLOR) -->
+        <!-- Name (LABEL : FIELD : COLOR) — icon removed -->
         <label class="form-row row-3">
           <span class="lab">Name</span>
-          <div class="input-with-icon">
-            <svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5c-2.6 0-4.8 1.9-5.2 4.4-.1.7-.6 1.4-1.2 1.7l-1.3.7c-.7.4-.6 1.5.2 1.8 1.6.6 3 .8 4.4.7 1.7-.2 3.2-.9 4.4-2 1.1 1 2.6 1.7 4.3 1.9 1.5.2 3-.1 4.6-.8.8-.3.9-1.4.2-1.8l-1.5-.8c-.5-.3-.9-.8-1-1.3-.6-2.7-3-4.7-5.9-4.7zM9.5 20.5c-1.1 0-2-.9-2-2h9c0 1.1-.9 2-2 2h-5z" fill="currentColor"/>
-            </svg>
-            <input id="name" type="text" placeholder="e.g. Neon Duck" />
-          </div>
+          <input id="name" type="text" placeholder="e.g. Neon Duck" />
           <div class="color-cell">
             <input id="c_name" type="color" class="hidden-color">
             <button id="c_nameSw" type="button" class="swatch-btn"><span class="swatch"></span></button>
           </div>
         </label>
 
-        <!-- Name Modifier (LABEL : FIELD) -->
+        <!-- Name Modifier -->
         <label class="form-row row-2">
           <span class="lab">Name Modifier</span>
           <select id="nameMod">
@@ -43,7 +38,7 @@
           </select>
         </label>
 
-        <!-- Element (LABEL : FIELD) -->
+        <!-- Element -->
         <label class="form-row row-2">
           <span class="lab">Element</span>
           <select id="element">
@@ -64,6 +59,12 @@
           </select>
         </label>
 
+        <!-- Previous Stage Image (shown only if stage != base) -->
+        <label id="prevImgRow" class="form-row row-2" style="display:none">
+          <span class="lab">Previous Stage Image</span>
+          <input id="prevImg" type="file" accept="image/*" />
+        </label>
+
         <!-- Layout -->
         <label class="form-row row-2">
           <span class="lab">Layout</span>
@@ -73,43 +74,8 @@
           </select>
         </label>
 
-        <!-- Previous Stage Image -->
-        <label class="form-row row-2">
-          <span class="lab">Previous Stage Image</span>
-          <input id="prevImg" type="file" accept="image/*" />
-        </label>
-
-        <!-- Card Artwork -->
-        <label class="form-row row-2">
-          <span class="lab">Card Artwork</span>
-          <input id="mainImg" type="file" accept="image/*" />
-        </label>
-
-        <!-- Socials (ICON : LABEL : FIELD) -->
-        <fieldset class="col1 socials">
-          <legend>Socials</legend>
-
-          <div class="form-row row-3 social-row">
-            <img class="icon-sm" src="assets/youtube.svg" alt="">
-            <span class="lab">YouTube</span>
-            <input id="youtube" type="text" placeholder="YouTube name" />
-          </div>
-
-          <div class="form-row row-3 social-row">
-            <img class="icon-sm" src="assets/twitch.svg" alt="">
-            <span class="lab">Twitch</span>
-            <input id="twitch" type="text" placeholder="Twitch name" />
-          </div>
-
-          <div class="form-row row-3 social-row">
-            <img class="icon-sm" src="assets/instagram.svg" alt="">
-            <span class="lab">Instagram</span>
-            <input id="instagram" type="text" placeholder="Instagram name" />
-          </div>
-        </fieldset>
-
-        <!-- Background colors (swatch-only) -->
-        <div class="form-row row-2">
+        <!-- Background colors (swatch-only) — under Layout; hidden when Full Art -->
+        <div id="bgTopRow" class="form-row row-2">
           <span class="lab">BG Top Color</span>
           <div class="color-input solo">
             <input id="bgTop" class="hidden-color" type="color" value="#0a0d10">
@@ -119,7 +85,7 @@
           </div>
         </div>
 
-        <div class="form-row row-2">
+        <div id="bgBottomRow" class="form-row row-2">
           <span class="lab">BG Bottom Color</span>
           <div class="color-input solo">
             <input id="bgBottom" class="hidden-color" type="color" value="#0b0f12">
@@ -128,6 +94,47 @@
             </button>
           </div>
         </div>
+
+        <!-- Card Artwork -->
+        <label class="form-row row-2">
+          <span class="lab">Card Artwork</span>
+          <input id="mainImg" type="file" accept="image/*" />
+        </label>
+
+        <!-- Socials (ICON : LABEL : FIELD : COLOR) -->
+        <fieldset class="socials">
+          <legend>Socials</legend>
+
+          <div class="form-row row-4 social-row">
+            <img class="icon-sm" src="assets/youtube.svg" alt="">
+            <span class="lab">YouTube</span>
+            <input id="youtube" type="text" placeholder="YouTube name" />
+            <div class="color-cell">
+              <input id="c_social_yt" type="color" class="hidden-color">
+              <button id="c_social_ytSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+            </div>
+          </div>
+
+          <div class="form-row row-4 social-row">
+            <img class="icon-sm" src="assets/twitch.svg" alt="">
+            <span class="lab">Twitch</span>
+            <input id="twitch" type="text" placeholder="Twitch name" />
+            <div class="color-cell">
+              <input id="c_social_tw" type="color" class="hidden-color">
+              <button id="c_social_twSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+            </div>
+          </div>
+
+          <div class="form-row row-4 social-row">
+            <img class="icon-sm" src="assets/instagram.svg" alt="">
+            <span class="lab">Instagram</span>
+            <input id="instagram" type="text" placeholder="Instagram name" />
+            <div class="color-cell">
+              <input id="c_social_ig" type="color" class="hidden-color">
+              <button id="c_social_igSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+            </div>
+          </div>
+        </fieldset>
       </div>
     </section>
 
@@ -231,8 +238,7 @@
       <h1>Details</h1>
 
       <div class="grid">
-
-        <!-- Ability -->
+        <!-- (unchanged right panel content) -->
         <label class="form-row row-3">
           <span class="lab">Ability Name</span>
           <input id="abilityName" type="text" placeholder="e.g. Overclock Aura" />
@@ -251,7 +257,6 @@
           </div>
         </label>
 
-        <!-- Attack 1 -->
         <label class="form-row row-3">
           <span class="lab">Attack #1 Name</span>
           <input id="attackName" type="text" placeholder="e.g. Circuit Peck" />
@@ -279,7 +284,6 @@
           </div>
         </label>
 
-        <!-- Attack 2 -->
         <label class="form-row row-3">
           <span class="lab">Attack #2 Name</span>
           <input id="attack2Name" type="text" placeholder="e.g. Neon Burst" />
@@ -307,7 +311,6 @@
           </div>
         </label>
 
-        <!-- Flavour -->
         <label class="form-row row-3">
           <span class="lab">Flavour Text</span>
           <textarea id="flavour" rows="2" placeholder="Short lore or personality…"></textarea>
@@ -317,14 +320,10 @@
           </div>
         </label>
 
-        <!-- Footer -->
-        <label class="form-row row-3">
-          <span class="lab">Card Number (X/Y)</span>
-          <input id="numXY" type="text" placeholder="e.g. 12/99" />
-          <div class="color-cell">
-            <input id="c_numXY" type="color" class="hidden-color">
-            <button id="c_numXYSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
+        <!-- Footer (Set Icon above Set Name) -->
+        <label class="form-row row-2">
+          <span class="lab">Set Icon</span>
+          <input id="setIcon" type="file" accept="image/*" />
         </label>
 
         <label class="form-row row-3">
@@ -346,9 +345,13 @@
           </select>
         </label>
 
-        <label class="form-row row-2">
-          <span class="lab">Set Icon</span>
-          <input id="setIcon" type="file" accept="image/*" />
+        <label class="form-row row-3">
+          <span class="lab">Card Number (X/Y)</span>
+          <input id="numXY" type="text" placeholder="e.g. 12/99" />
+          <div class="color-cell">
+            <input id="c_numXY" type="color" class="hidden-color">
+            <button id="c_numXYSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
       </div>
     </section>
