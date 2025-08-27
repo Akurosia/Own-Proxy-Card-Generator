@@ -51,7 +51,6 @@
           </select>
         </label>
 
-        <!-- Layout -->
         <label>
           Layout
           <select id="layoutMode">
@@ -86,47 +85,26 @@
           </label>
         </fieldset>
 
-        <!-- Background colors -->
-        <label>
+        <!-- Background colors (with live swatches) -->
+        <label class="color-picker">
           BG Top Color
-          <input id="bgTop" type="color" value="#0a0d10">
+          <div class="color-input">
+            <input id="bgTop" type="color" value="#0a0d10">
+            <span id="bgTopSwatch" class="swatch" title="Top color"></span>
+          </div>
         </label>
-        <label>
+        <label class="color-picker">
           BG Bottom Color
-          <input id="bgBottom" type="color" value="#0b0f12">
-        </label>
-
-        <!-- Footer data -->
-        <label>
-          Card Number (X/Y)
-          <input id="numXY" type="text" placeholder="e.g. 12/99" />
-        </label>
-
-        <label>
-          Set Name
-          <input id="setName" type="text" placeholder="e.g. Night Circuit" />
-        </label>
-
-        <label>
-          Rarity
-          <select id="rarity">
-            <option value="common">Common</option>
-            <option value="uncommon">Uncommon</option>
-            <option value="rare">Rare</option>
-            <option value="ultra">Ultra</option>
-          </select>
-        </label>
-
-        <label class="col2">
-          Set Icon (optional)
-          <input id="setIcon" type="file" accept="image/*" />
+          <div class="color-input">
+            <input id="bgBottom" type="color" value="#0b0f12">
+            <span id="bgBottomSwatch" class="swatch" title="Bottom color"></span>
+          </div>
         </label>
       </div>
     </section>
 
     <!-- CANVAS (center column) -->
     <section class="canvasZone">
-      <!-- Display-only scaler to fit 1080p screens -->
       <div class="card-viewport">
         <div class="card" id="card">
           <div class="card-inner" aria-hidden="true"></div>
@@ -154,10 +132,10 @@
             <img id="artImg" alt="">
           </div>
 
-          <!-- NEW: spacer keeps layout positions in Full Art -->
+          <!-- Spacer to keep layout identical in Full Art -->
           <div class="art-spacer" aria-hidden="true"></div>
 
-          <!-- Social bar (static assets icons) -->
+          <!-- Social bar -->
           <div class="card-socials">
             <div class="socialItem" data-kind="youtube">
               <img class="icon" src="assets/youtube.svg" alt="YouTube">
@@ -200,7 +178,7 @@
             <p id="attack2EffectText"></p>
           </section>
 
-          <!-- Flavour aligned to bottom, just above card-credit -->
+          <!-- Flavour aligned to bottom -->
           <p class="card-flavour" id="flavourText"></p>
 
           <!-- Bottom credit bar -->
@@ -228,7 +206,7 @@
       <div class="exportNote">What you see is what gets exported.</div>
     </section>
 
-    <!-- RIGHT PANEL — DETAILS -->
+    <!-- RIGHT PANEL — DETAILS & FOOTER FIELDS -->
     <section class="panel panel-right">
       <h1>Details</h1>
 
@@ -275,6 +253,32 @@
         <label class="col2">
           Flavour Text
           <textarea id="flavour" rows="2" placeholder="Short lore or personality…"></textarea>
+        </label>
+
+        <!-- FOOTER — moved here -->
+        <label>
+          Card Number (X/Y)
+          <input id="numXY" type="text" placeholder="e.g. 12/99" />
+        </label>
+
+        <label>
+          Set Name
+          <input id="setName" type="text" placeholder="e.g. Night Circuit" />
+        </label>
+
+        <label>
+          Rarity
+          <select id="rarity">
+            <option value="common">Common</option>
+            <option value="uncommon">Uncommon</option>
+            <option value="rare">Rare</option>
+            <option value="ultra">Ultra</option>
+          </select>
+        </label>
+
+        <label class="col2">
+          Set Icon (optional)
+          <input id="setIcon" type="file" accept="image/*" />
         </label>
       </div>
     </section>

@@ -1,4 +1,4 @@
-/* Stream Saga — Full Art keeps positions (spacer), 2 demos, local export libs */
+/* Stream Saga — unchanged logic; footer fields now live in right panel */
 
 const el = id => document.getElementById(id);
 
@@ -26,9 +26,11 @@ function bindInputs(){
     ["element","change", v => { state.element=v; drawElement(); }],
     ["stage","change", v => { state.stage=v; drawStage(); }],
     ["layoutMode","change", v => { setLayout(v); }],
+    // footer fields (now right panel)
     ["numXY","input", v => { state.numXY=v; drawCredit(); }],
     ["setName","input", v => { state.setName=v; drawCredit(); }],
     ["rarity","change", v => { state.rarity=v; drawCredit(); }],
+
     ["youtube","input", v => { state.youtube=v; drawSocials(); }],
     ["twitch","input", v => { state.twitch=v; drawSocials(); }],
     ["instagram","input", v => { state.instagram=v; drawSocials(); }],
@@ -56,9 +58,19 @@ function bindInputs(){
   el("prevImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.prevURL=url; drawStage(); }));
   el("setIcon").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.setIconURL=url; drawCredit(); }));
 
-  // background colors
-  el("bgTop").addEventListener("input", e=>{ el("card").style.setProperty("--bg-top", e.target.value); });
-  el("bgBottom").addEventListener("input", e=>{ el("card").style.setProperty("--bg-bottom", e.target.value); });
+  // background colors + swatches
+  const updateColors = () => {
+    const top = el("bgTop").value || "#0a0d10";
+    const bot = el("bgBottom").value || "#0b0f12";
+    const card = el("card");
+    card.style.setProperty("--bg-top", top);
+    card.style.setProperty("--bg-bottom", bot);
+    const tSw = el("bgTopSwatch"); if(tSw) tSw.style.background = top;
+    const bSw = el("bgBottomSwatch"); if(bSw) bSw.style.background = bot;
+  };
+  el("bgTop").addEventListener("input", updateColors);
+  el("bgBottom").addEventListener("input", updateColors);
+  updateColors();
 
   // buttons
   el("resetBtn").addEventListener("click", resetForm);
@@ -139,7 +151,7 @@ function drawCredit(){
   el("rarityIcon").innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
 }
 
-/* Demo: Normal */
+/* Demo helpers */
 function makeDataImage(w,h,draw){ const c=document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d'); draw(ctx,w,h); return c.toDataURL('image/png'); }
 function prefillNormal(){
   const set=(id,val)=>{ const n=el(id); if(n) n.value=val; };
@@ -155,13 +167,8 @@ function prefillNormal(){
   state.flavour="Raised on city neon and late-night streams, this duck quacks in binary and dreams in blue-and-red.";
 
   set("layoutMode","standard");
-  set("name",state.name); set("nameMod",state.nameMod); set("element",state.element); set("stage",state.stage);
-  set("youtube",state.youtube); set("twitch",state.twitch); set("instagram",state.instagram);
-  set("numXY",state.numXY); set("setName",state.setName); set("rarity",state.rarity);
-  set("abilityName",state.abilityName); set("abilityText",state.abilityText);
-  set("attackName",state.attackName); set("attackValue",state.attackValue); set("attackEffect",state.attackEffect);
-  set("attack2Name",state.attack2Name); set("attack2Value",state.attack2Value); set("attack2Effect",state.attack2Effect);
-  set("flavour",state.flavour);
+  ["name","nameMod","element","stage","youtube","twitch","instagram","numXY","setName","rarity","abilityName","abilityText","attackName","attackValue","attackEffect","attack2Name","attack2Value","attack2Effect","flavour"]
+    .forEach(id=>el(id)&& (el(id).value=state[id] ?? ""));
 
   state.artURL = makeDataImage(1200,800,(ctx,w,h)=>{ const g=ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'#0a0d10'); g.addColorStop(1,'#243f66'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalAlpha=.25; ctx.strokeStyle='#39b8ff'; ctx.lineWidth=40; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w,h); ctx.moveTo(w,0); ctx.lineTo(0,h); ctx.stroke(); ctx.globalAlpha=1; });
   state.setIconURL = makeDataImage(128,128,(ctx,w,h)=>{ ctx.fillStyle='#12171c'; ctx.fillRect(0,0,w,h); ctx.strokeStyle='#39b8ff'; ctx.lineWidth=10; ctx.strokeRect(14,14,w-28,h-28); ctx.strokeStyle='#ff3b3b'; ctx.beginPath(); ctx.moveTo(28,28); ctx.lineTo(w-28,h-28); ctx.moveTo(w-28,28); ctx.lineTo(28,h-28); ctx.stroke(); });
@@ -170,7 +177,6 @@ function prefillNormal(){
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
 }
 
-/* Demo: Full Art (positions preserved by spacer) */
 function prefillFullArt(){
   const set=(id,val)=>{ const n=el(id); if(n) n.value=val; };
 
@@ -185,15 +191,9 @@ function prefillFullArt(){
   state.flavour="Lit by the skyline, boosted by chat—this duck never logs off.";
 
   set("layoutMode","full");
-  set("name",state.name); set("nameMod",state.nameMod); set("element",state.element); set("stage",state.stage);
-  set("youtube",state.youtube); set("twitch",state.twitch); set("instagram",state.instagram);
-  set("numXY",state.numXY); set("setName",state.setName); set("rarity",state.rarity);
-  set("abilityName",state.abilityName); set("abilityText",state.abilityText);
-  set("attackName",state.attackName); set("attackValue",state.attackValue); set("attackEffect",state.attackEffect);
-  set("attack2Name",state.attack2Name); set("attack2Value",state.attack2Value); set("attack2Effect",state.attack2Effect);
-  set("flavour",state.flavour);
+  ["name","nameMod","element","stage","youtube","twitch","instagram","numXY","setName","rarity","abilityName","abilityText","attackName","attackValue","attackEffect","attack2Name","attack2Value","attack2Effect","flavour"]
+    .forEach(id=>el(id)&& (el(id).value=state[id] ?? ""));
 
-  // full art background
   state.artURL = makeDataImage(1400,1000,(ctx,w,h)=>{
     const g=ctx.createLinearGradient(0,0,w,h);
     g.addColorStop(0,'#0a0d10'); g.addColorStop(.45,'#123a64'); g.addColorStop(1,'#3b0f18');
@@ -203,12 +203,12 @@ function prefillFullArt(){
     ctx.globalAlpha=1;
   });
   state.setIconURL = makeDataImage(128,128,(ctx,w,h)=>{ ctx.fillStyle='#0e1419'; ctx.fillRect(0,0,w,h); ctx.strokeStyle='#8cd6ff'; ctx.lineWidth=8; ctx.beginPath(); ctx.arc(w/2,h/2,40,0,Math.PI*2); ctx.stroke(); ctx.strokeStyle='#ff6b6b'; ctx.beginPath(); ctx.moveTo(20,20); ctx.lineTo(w-20,h-20); ctx.moveTo(w-20,20); ctx.lineTo(20,h-20); ctx.stroke(); });
-  state.prevURL = ""; // base layout
+  state.prevURL = "";
 
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
 }
 
-/* Export libs — load from local files as requested */
+/* Export libs — local files */
 function loadScript(src){
   return new Promise((res,rej)=>{
     if(document.querySelector('script[src="'+src+'"]')) return res();
@@ -230,17 +230,13 @@ async function downloadPNG(){
   await ensureExportLibs();
   if(document.fonts && document.fonts.ready) await document.fonts.ready;
 
-  // wait for images (art, prev thumb, set icon, social icons)
   const imgs=[el("artImg"), el("prevThumb"), el("setIconImg"), ...document.querySelectorAll(".card-socials .icon")].filter(Boolean);
   await Promise.all(imgs.map(i=> i && i.src && !i.complete ? new Promise(r=>i.addEventListener("load",r,{once:true})) : Promise.resolve()));
 
-  // inline gradient vars so clone matches
   const cs=getComputedStyle(card); const top=(cs.getPropertyValue('--bg-top')||'#0a0d10').trim(); const bottom=(cs.getPropertyValue('--bg-bottom')||'#0b0f12').trim();
   card.style.setProperty('--bg-top', top); card.style.setProperty('--bg-bottom', bottom); card.style.backgroundImage=`linear-gradient(180deg, ${top}, ${bottom})`;
 
   const filename=(state.name||'card')+'.png';
-
-  // temporarily disable display scale so export is full-res
   const viewportCard = document.querySelector(".card-viewport > .card") || card;
   const prevTransform = viewportCard.style.transform;
   viewportCard.style.transform = "none";
@@ -253,7 +249,7 @@ async function downloadPNG(){
       const dataUrl2 = await window.domtoimage.toPng(card,{quality:1,bgcolor:'transparent',height:card.offsetHeight,width:card.offsetWidth,style:{'--bg-top':top,'--bg-bottom':bottom,'backgroundImage':`linear-gradient(180deg, ${top}, ${bottom})`}});
       triggerDownload(dataUrl2, filename);
     }catch(e2){
-      alert('Export failed. Make sure html-to-image.js and dom-to-image-more.js are present.');
+      alert('Export failed. Ensure html-to-image.js and dom-to-image-more.js are present.');
       console.error(e1, e2);
     }
   } finally {
@@ -268,6 +264,11 @@ function resetForm(){
   state.element="calm"; state.stage="base"; state.rarity="common"; state.layout="standard";
   setLayout("standard");
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
+
+  const t=el("bgTop"), b=el("bgBottom");
+  if(t) t.value="#0a0d10"; if(b) b.value="#0b0f12";
+  const tSw = el("bgTopSwatch"); if(tSw) tSw.style.background = t.value;
+  const bSw = el("bgBottomSwatch"); if(bSw) bSw.style.background = b.value;
 }
 
 /* Init */
