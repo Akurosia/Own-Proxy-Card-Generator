@@ -1,6 +1,5 @@
 /* Stream Saga – Panels aligned + compact rows + swatch-only color pickers */
 
-/* keep your variables exactly */
 :root{
   --bg:#0b0f12; --panel:#12171c; --ink:#d4e1ee; --muted:#8ea0b2; --line:#1c232b;
   --blue:#39b8ff; --red:#ff3b3b;
@@ -43,30 +42,25 @@ body{margin:0;background:#070b0f;color:var(--ink);font:400 13.5px/1.45 var(--fon
 .panel-left{ min-width:var(--panel-w-l) } .panel-right{ min-width:var(--panel-w-r) }
 .panel h1{font:700 20px/1 var(--font-display); margin:0 0 12px}
 
-/* Grid containers become vertical stacks */
+/* Grid container becomes vertical stack */
 .grid{ display:flex; flex-direction:column; gap:12px }
 
-/* Row types */
+/* Rows */
 .form-row{ width:100% }
 .form-row .lab{ color:#bcd0e2; font:700 12px var(--font-display) }
 .row-2{ display:grid; grid-template-columns: 140px 1fr; align-items:center; gap:10px }
 .row-3{ display:grid; grid-template-columns: 140px 1fr 40px; align-items:center; gap:10px }
-
-/* Social rows (ICON : LABEL : FIELD) */
+/* Social rows: ICON : LABEL : FIELD : COLOR */
 .socials{ border:1px solid #141a21; border-radius:12px; padding:12px }
 legend{ padding:0 6px; color:#bcd0e2; font:700 12px var(--font-display) }
-.social-row{ grid-template-columns: 28px 110px 1fr }
+.social-row.row-4{ display:grid; grid-template-columns: 28px 110px 1fr 40px; align-items:center; gap:10px }
 .icon-sm{ width:20px; height:20px; opacity:.95 }
 
 /* Inputs */
 input,select,textarea{background:#0e1419;border:1px solid #141a21;border-radius:10px;padding:8px 10px;color:var(--ink)}
-textarea{resize:vertical}
+textarea{resize:vertical;width:300px}
 
-/* Name field icon */
-.input-with-icon{ display:flex; align-items:center; gap:8px }
-.mini-icon{ width:18px; height:18px; color:#8cd6ff; }
-
-/* Color controls — hide native input; show only square swatch button */
+/* Swatch-only color inputs */
 .hidden-color{
   position:absolute !important; width:0 !important; height:0 !important;
   opacity:0 !important; pointer-events:none !important; border:0 !important; padding:0 !important;
@@ -87,14 +81,14 @@ button{border:1px solid #1a2129;background:#0f151a;color:var(--ink);padding:8px 
 button:hover{border-color:#293544}
 .exportNote{color:#8ea0b2;font-size:12px}
 
-/* Card visuals (unchanged from prior good version) */
+/* Card base */
 .card{ width:var(--card-w); height:var(--card-h); border-radius:var(--radius-lg); border:2px solid #1a2129;
   box-shadow:var(--shadow-inset),var(--shadow-outer); position:relative; overflow:hidden;
   background:linear-gradient(180deg,var(--bg-top,#0a0d10),var(--bg-bottom,#0b0f12));
 }
 .card-inner{position:absolute;inset:14px;border-radius:20px;z-index:0;border:1px solid #171d24;background:repeating-linear-gradient(135deg,#0e1318 0 10px,#0e1419 10px 20px);opacity:.25}
 
-/* Frame corners radius 26px */
+/* Corners */
 .frame{position:absolute;inset:10px;z-index:1;pointer-events:none}
 .frame-corner{position:absolute;width:60px;height:60px}
 .frame-corner::before{content:"";position:absolute;inset:0;border:2px solid;background:transparent}
@@ -103,8 +97,11 @@ button:hover{border-color:#293544}
 .frame-corner.br{bottom:0;right:0}.frame-corner.br::before{border-color:transparent var(--red) var(--red) transparent;border-radius:0 0 26px 0}
 .frame-corner.bl{bottom:0;left:0}.frame-corner.bl::before{border-color:transparent transparent var(--blue) var(--blue);border-radius:0 0 0 26px}
 
-/* Header */
-.card-head{position:relative;z-index:2;display:grid;grid-template-columns:110px 1fr 150px;align-items:center;padding:18px 24px 10px}
+/* Header (no bottom border) */
+.card-head{
+  position:relative;z-index:2;display:grid;grid-template-columns:110px 1fr 150px;align-items:center;
+  padding:18px 24px 10px;border-bottom:0;
+}
 .badge.element{padding:6px 9px;border-radius:10px;border:1px solid #182029;background:#0f1419;font:700 13px var(--font-display);text-transform:uppercase}
 .title{display:flex;gap:8px;justify-content:center}
 #titleName{font:700 28px var(--font-display);color:#cfe8ff}
@@ -113,7 +110,7 @@ button:hover{border-color:#293544}
 .stage{justify-self:end;display:flex;align-items:center;gap:8px}
 .stage img{display:none;width:40px;height:40px;border-radius:8px}
 
-/* Art & content */
+/* Art & sections */
 .card-art{position:relative;z-index:1;margin:8px 24px 0;height:500px;border-radius:var(--radius-md);overflow:hidden;border:1px solid #141b22;background:#0f1317}
 .card-art img{width:100%;height:100%;object-fit:cover}
 .art-spacer{display:none}
@@ -133,23 +130,21 @@ button:hover{border-color:#293544}
 .card-flavour{position:absolute;left:22px;right:22px;bottom:calc(60px + 10px);padding:10px;font-style:italic;text-align:center;border-left:3px solid #1d2a34;background:#0e1318;border-radius:10px;z-index:2}
 .card-flavour:empty{display:none}
 
-/* Credit bar */
+/* Credit bar (no top border) */
 .card-credit{
   position:absolute;left:22px;right:22px;bottom:12px;height:60px;
   display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;
-  color:#6a7c8f;font:700 11px var(--font-display);border-top:1px solid #151c23;padding-top:8px;z-index:2
+  color:#6a7c8f;font:700 11px var(--font-display);padding-top:8px;z-index:2;border-top:0;
 }
 .card-credit .credit-left{display:flex;align-items:center;gap:10px}
 .card-credit .credit-left img{display:none;width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 0 4px rgba(57,184,255,.25))}
 .card-credit .credit-left span{font:700 12px var(--font-display);color:#cfe4ff}
 .card-credit .credit-right{display:flex;align-items:center;gap:10px;justify-self:end}
 .card-credit .credit-right #numOut{color:#cfe4ff;font:700 12px var(--font-display)}
-.card-credit .credit-right .rarity svg{width:18px;height:18px;fill:#c9c9c9}
+.card-credit .credit-right .rarity svg{width:18px;height:18px} /* fill handled inline for custom color */
 .card-credit .credit-center{ position:absolute; left:50%; transform:translateX(-50%); white-space:nowrap; text-align:center; pointer-events:none; color:#8ea0b2 }
 
-.rarity.common svg{fill:#c9c9c9}.rarity.uncommon svg{fill:#8cd6ff}.rarity.rare svg{fill:#ffd700}.rarity.ultra svg{fill:#ff3b3b}
-
-/* Full Art variant */
+/* Full Art variant (also no header border) */
 .card.fullart .card-inner{display:none;}
 .card.fullart .card-art{ position:absolute; inset:0; margin:0; height:auto; border:none; border-radius:inherit; z-index:0; }
 .card.fullart .card-art img{object-fit:cover}
@@ -157,7 +152,7 @@ button:hover{border-color:#293544}
 .card.fullart .card-head{
   position:relative; z-index:2;
   background: linear-gradient(180deg, rgba(5,8,12,.75), rgba(5,8,12,.05) 90%);
-  border-bottom: 1px solid rgba(20,27,34,.35);
+  border-bottom:0;
 }
 .card.fullart .card-socials,
 .card.fullart .card-ability,
@@ -169,33 +164,3 @@ button:hover{border-color:#293544}
 
 /* Short screens */
 @media (max-height:900px){ :root{ --card-scale:0.78 } }
-
-/* Row types */
-.form-row{ width:100% }
-.form-row .lab{ color:#bcd0e2; font:700 12px var(--font-display) }
-.row-2{ display:grid; grid-template-columns: 140px 1fr; align-items:center; gap:10px }
-.row-3{ display:grid; grid-template-columns: 140px 1fr 40px; align-items:center; gap:10px }
-/* Social rows: ICON : LABEL : FIELD : COLOR */
-.socials{ border:1px solid #141a21; border-radius:12px; padding:12px }
-legend{ padding:0 6px; color:#bcd0e2; font:700 12px var(--font-display) }
-.social-row.row-4{ display:grid; grid-template-columns: 28px 110px 1fr 40px; align-items:center; gap:10px }
-.icon-sm{ width:20px; height:20px; opacity:.95 }
-
-/* Hidden native color + swatch */
-.hidden-color{
-  position:absolute !important; width:0 !important; height:0 !important;
-  opacity:0 !important; pointer-events:none !important; border:0 !important; padding:0 !important;
-}
-.swatch-btn{
-  width:28px; height:28px; border:1px solid #2a3541; border-radius:6px;
-  background:#0e1419; padding:0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
-}
-.swatch-btn .swatch{ width:20px; height:20px; border-radius:4px; border:1px solid #2a3541 }
-.color-input.solo{ display:flex; align-items:center; gap:8px }
-input,select,textarea{
-  background:#0e1419;border:1px solid #141a21;border-radius:10px;padding:8px 10px;color:var(--ink)
-}
-textarea{
-  resize:vertical;
-  width:300px;      /* CHANGED */
-}

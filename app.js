@@ -1,4 +1,4 @@
-/* Stream Saga — per-field color swatches, compact rows, socials as ICON:LABEL:FIELD */
+/* Stream Saga — rarity color picker + extra rarities, grouped fields, export (inline SVG icons) */
 
 const el = id => document.getElementById(id);
 
@@ -16,7 +16,8 @@ const state = {
   numXY: "",
   setName: "",
   rarity: "common",
-  artURL: "", prevURL: "", setIconURL: ""
+  artURL: "", prevURL: "", setIconURL: "",
+  rarityColorOverride: false
 };
 
 function bindInputs(){
@@ -46,7 +47,7 @@ function bindInputs(){
 
     ["numXY","input", v => { state.numXY=v; drawCredit(); }],
     ["setName","input", v => { state.setName=v; drawCredit(); }],
-    ["rarity","change", v => { state.rarity=v; drawCredit(); }],
+    ["rarity","change", v => { state.rarity=v; state.rarityColorOverride=false; drawCredit(); syncRarityColorSwatch(); }],
   ];
   map.forEach(([id,ev,fn])=>{
     const n=el(id);
@@ -63,18 +64,26 @@ function bindInputs(){
   setupSwatch("bgBottom","bgBottomSwatch", updateBgColors);
   updateBgColors();
 
-  // Per-field text colors
+  // Per-field text colors (includes socials)
   initTextColorSwatches();
+
+  // RARITY color picker
+  setupSwatch("c_rarity","c_raritySw", ()=> {
+    const val = el("c_rarity").value;
+    const svg = el("rarityIcon");
+    if(svg){ svg.style.fill = val; }
+    state.rarityColorOverride = true;
+  });
 
   // buttons
   el("resetBtn").addEventListener("click", resetForm);
   el("prefillNormalBtn").addEventListener("click", prefillNormal);
   el("prefillFullBtn").addEventListener("click", prefillFullArt);
   el("downloadBtn").addEventListener("click", downloadPNG);
-}
 
-/* Toggle helpers */
-function show(elm, flag){ if(!elm) return; elm.style.display = flag ? "" : "none"; }
+  // initial visibility
+  setTimeout(()=>{ drawStage(); setLayout(el("layoutMode")?.value || "standard"); },0);
+}
 
 function loadFile(file, cb){
   if(!file) return;
@@ -92,10 +101,10 @@ function setupSwatch(inputId, swatchBtnId, onChange){
   const sync = ()=>{ if(box) box.style.background = input.value || "#000"; if(onChange) onChange(); };
   btn.addEventListener('click', ()=> input.click());
   input.addEventListener('input', sync);
-  sync();
+  if(box) box.style.background = input.value || "#000";
 }
 
-/* Text color swatches mapping: inputId/swatchId/targetSelector */
+/* Text color swatches mapping */
 const textColorMap = [
   ["c_name","c_nameSw","#titleName"],
   ["c_abilityName","c_abilityNameSw","#abilityTitle"],
@@ -109,7 +118,6 @@ const textColorMap = [
   ["c_flavour","c_flavourSw","#flavourText"],
   ["c_numXY","c_numXYSw","#numOut"],
   ["c_setName","c_setNameSw","#setNameText"],
-  // socials:
   ["c_social_yt","c_social_ytSw","#ytName"],
   ["c_social_tw","c_social_twSw","#twName"],
   ["c_social_ig","c_social_igSw","#igName"],
@@ -131,48 +139,50 @@ function initTextColorSwatches(){
   });
 }
 
+/* Show/hide helper */
+function show(node, flag){ if(!node) return; node.style.display = flag ? "" : "none"; }
+
 /* Background gradient */
 function updateBgColors(){
   const top = el("bgTop").value || "#0a0d10";
-  const bot = el("bgBottom").value || "#0b0f12";
+  const bottom = el("bgBottom").value || "#0b0f12";
   const card = el("card");
   card.style.setProperty("--bg-top", top);
-  card.style.setProperty("--bg-bottom", bot);
+  card.style.setProperty("--bg-bottom", bottom);
 }
 
-/* Layout toggle */
+/* Layout toggle + BG visibility */
 function setLayout(mode){
   state.layout = mode === "full" ? "full" : "standard";
   const card = el("card");
   card.classList.toggle("fullart", state.layout === "full");
   const sel = el("layoutMode");
   if (sel && sel.value !== state.layout) sel.value = state.layout;
-
-  // show BG pickers only in Standard layout
   show(el("bgTopRow"), state.layout !== "full");
   show(el("bgBottomRow"), state.layout !== "full");
 }
 
-/* Drawers */
-function drawText(){ el("titleName").textContent = state.name || " "; el("titleMod").textContent = state.nameMod || ""; }
-function drawElement(){ const b=el("elementBadge"); b.textContent=(state.element||"").toUpperCase(); b.className="badge element "+state.element; }
+/* Stage toggle + previous image row */
 function drawStage(){
   el("stageText").textContent = state.stage==="base"?"Base":(state.stage==="step1"?"Step 1":"Step 2");
   const t=el("prevThumb");
   const row = el("prevImgRow");
   const nonBase = state.stage !== "base";
   show(row, nonBase);
-
   if(nonBase && state.prevURL){ t.src=state.prevURL; t.style.display="block"; }
   else { t.removeAttribute("src"); t.style.display="none"; }
 }
+
+/* Drawers */
+function drawText(){ el("titleName").textContent = state.name || " "; el("titleMod").textContent = state.nameMod || ""; }
+function drawElement(){ const b=el("elementBadge"); b.textContent=(state.element||"").toUpperCase(); b.className="badge element "+state.element; }
 function drawArt(){ const img=el("artImg"); if(state.artURL){ img.src=state.artURL; img.style.display="block"; } else { img.removeAttribute("src"); img.style.display="none"; } }
 function drawSocials(){
   const pairs=[["ytName",state.youtube],["twName",state.twitch],["igName",state.instagram]];
   let any=false;
   pairs.forEach(([id,val])=>{
     const n=el(id); n.textContent=val||"";
-    const show=!!(val && val.trim()); n.parentElement.style.display=show?"flex":"none"; if(show) any=true;
+    const showRow=!!(val && val.trim()); n.parentElement.style.display=showRow?"flex":"none"; if(showRow) any=true;
   });
   document.querySelector(".card-socials").style.display = any ? "flex" : "none";
 }
@@ -205,38 +215,88 @@ function drawAttack2(){
   } else { box.style.display="none"; }
 }
 function drawFlavour(){ el("flavourText").textContent=state.flavour || ""; }
+
+/* Rarity drawing (shapes + default colors, supports override) */
 function drawCredit(){
-  el("setNameText").textContent = state.setName || "";
-  el("numOut").textContent = state.numXY || "";
+  el("setNameText").textContent=state.setName||""; el("numOut").textContent=state.numXY||"";
 
-  const iconImg = el("setIconImg");
-  if (state.setIconURL){ iconImg.src = state.setIconURL; iconImg.style.display = "inline-block"; }
-  else { iconImg.removeAttribute("src"); iconImg.style.display = "none"; }
+  const icon=el("setIconImg");
+  if(state.setIconURL){ icon.src=state.setIconURL; icon.style.display="inline-block"; } else { icon.removeAttribute("src"); icon.style.display="none"; }
 
-  const rarityWrap = document.querySelector(".card-credit .rarity");
-  const r = (state.rarity || "common");
-  rarityWrap.className = "rarity " + r;
+  const rarityWrap=document.querySelector(".card-credit .rarity");
+  const r=(state.rarity||"common");
+  rarityWrap.className="rarity "+r;
 
-  // Different shapes per rarity
   const rarityIcon = el("rarityIcon");
-  let svg = "";
+  let svg="";
   switch(r){
-    case "common":   // circle
-      svg = '<circle cx="12" cy="12" r="7.5"/>';
-      break;
-    case "uncommon": // diamond
-      svg = '<path d="M12 3l7 9-7 9-7-9 7-9z"/>';
-      break;
-    case "rare":     // star
-      svg = '<path d="M12 2.5l3.1 6.3 7 1-5.1 5 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5.1-5 7-1L12 2.5z"/>';
-      break;
-    case "ultra":    // crown
-      svg = '<path d="M3 17h18v2H3v-2zM3 9l4 3 5-6 5 6 4-3v7H3V9z"/>';
-      break;
-    default:
-      svg = '<circle cx="12" cy="12" r="7.5"/>';
+    case "common":   svg = '<circle cx="12" cy="12" r="7.5"/>'; break;              // circle
+    case "uncommon": svg = '<path d="M12 3l7 9-7 9-7-9 7-9z"/>'; break;            // diamond
+    case "rare":     svg = '<path d="M12 2.5l3.1 6.3 7 1-5.1 5 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5.1-5 7-1L12 2.5z"/>'; break; // star
+    case "ultra":    svg = '<path d="M3 17h18v2H3v-2zM3 9l4 3 5-6 5 6 4-3v7H3V9z"/>'; break; // crown
+    case "epic":     svg = '<path d="M12 2l7 4v8l-7 4-7-4V6z"/>'; break;          // hexagon-ish
+    case "mythic":   svg = '<path d="M12 3l9 16H3z"/>'; break;                    // triangle
+    case "secret":   svg = '<path d="M12 5c-5 0-9 7-9 7s4 7 9 7 9-7 9-7-4-7-9-7zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>'; break; // eye
+    default:         svg = '<circle cx="12" cy="12" r="7.5"/>';
   }
   rarityIcon.innerHTML = svg;
+
+  const defaultFill = {
+    common:"#c9c9c9",
+    uncommon:"#8cd6ff",
+    rare:"#ffd700",
+    ultra:"#ff3b3b",
+    epic:"#b388ff",
+    mythic:"#ff9f43",
+    secret:"#2fd2c9"
+  }[r] || "#c9c9c9";
+
+  if(!state.rarityColorOverride){
+    rarityIcon.style.fill = defaultFill;
+  }
+}
+
+/* === NEW: Replace social <img class="icon" src="*.svg"> with inline <svg> nodes === */
+async function inlineSocialSVGIcons(root){
+  const imgs = Array.from(root.querySelectorAll("img.icon"));
+  const svgImgs = imgs.filter(img => {
+    const src = img.getAttribute("src") || "";
+    return /\.svg(\?.*)?$/i.test(src);
+  });
+  await Promise.all(svgImgs.map(async img => {
+    try{
+      const res = await fetch(img.src, {cache:"no-store"});
+      const text = await res.text();
+
+      // Parse SVG safely
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, "image/svg+xml");
+      const svg = doc.documentElement;
+
+      if(!svg || svg.nodeName.toLowerCase() !== "svg") return;
+
+      // Clean potentially problematic attributes
+      svg.removeAttribute("width");
+      svg.removeAttribute("height");
+      svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+
+      // Carry over classes and ARIA
+      const cls = (img.getAttribute("class")||"") + " svg-inline";
+      svg.setAttribute("class", cls.trim());
+      const alt = img.getAttribute("alt") || "";
+      if(alt){ svg.setAttribute("role","img"); svg.setAttribute("aria-label", alt); }
+
+      // Constrain size via inline style so exporters respect it
+      svg.style.width = (getComputedStyle(img).width || "18px");
+      svg.style.height = (getComputedStyle(img).height || "18px");
+      svg.style.display = "block";
+
+      // Replace <img> with <svg>
+      img.replaceWith(svg);
+    }catch(e){
+      console.warn("Inline SVG failed for", img.src, e);
+    }
+  }));
 }
 
 /* utils */
@@ -248,16 +308,23 @@ function toHex(rgb){
   const b = (+m[3]).toString(16).padStart(2,"0");
   return `#${r}${g}${b}`;
 }
+function syncRarityColorSwatch(){
+  const svg = el("rarityIcon");
+  const input = el("c_rarity");
+  const swBtn = el("c_raritySw");
+  if(!svg || !input || !swBtn) return;
+  const cur = toHex(getComputedStyle(svg).fill || "#c9c9c9");
+  input.value = cur;
+  const box = swBtn.querySelector('.swatch'); if(box) box.style.background = cur;
+}
 
-/* Demo helpers and export (unchanged from previous working version) */
+/* Prefills */
 function makeDataImage(w,h,draw){ const c=document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d'); draw(ctx,w,h); return c.toDataURL('image/png'); }
 function prefillNormal(){
-  const set=(id,val)=>{ const n=el(id); if(n) n.value=val; };
-
   setLayout("standard");
   state.name="Neon Duck"; state.nameMod="EX"; state.element="chaotic"; state.stage="step1";
   state.youtube="NeonDuckYT"; state.twitch="NeonDuckLive"; state.instagram="neon.duck";
-  state.numXY="12/99"; state.setName="Night Circuit"; state.rarity="rare";
+  state.numXY="12/99"; state.setName="Night Circuit"; state.rarity="rare"; state.rarityColorOverride=false;
 
   state.abilityName="Overclock Aura"; state.abilityText="Once per turn, your next attack deals +20 if you changed a setting.";
   state.attackName="Circuit Peck"; state.attackValue="70"; state.attackEffect="Flip a coin. If heads, the target is stunned next turn.";
@@ -272,17 +339,14 @@ function prefillNormal(){
   state.prevURL = makeDataImage(256,256,(ctx,w,h)=>{ const g=ctx.createLinearGradient(0,0,w,0); g.addColorStop(0,'#111b24'); g.addColorStop(1,'#2a1a1a'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h); });
 
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
-
-  // re-init color swatches to reflect current computed colors
   initTextColorSwatches();
+  syncRarityColorSwatch();
 }
 function prefillFullArt(){
-  const set=(id,val)=>{ const n=el(id); if(n) n.value=val; };
-
   setLayout("full");
   state.name="Skyline Duck"; state.nameMod="MAX"; state.element="friendly"; state.stage="base";
   state.youtube="SkylineStreams"; state.twitch="SkylineDuck"; state.instagram="sky.duck";
-  state.numXY="01/45"; state.setName="City Lights"; state.rarity="ultra";
+  state.numXY="01/45"; state.setName="City Lights"; state.rarity="ultra"; state.rarityColorOverride=false;
 
   state.abilityName="City Sync"; state.abilityText="While this card is Active, your attacks cost 1 less energy if you streamed this turn.";
   state.attackName="Billboard Bash"; state.attackValue="110"; state.attackEffect="If you have more followers than your opponent, draw a card.";
@@ -305,6 +369,7 @@ function prefillFullArt(){
 
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
   initTextColorSwatches();
+  syncRarityColorSwatch();
 }
 
 /* Export libs */
@@ -329,11 +394,18 @@ async function downloadPNG(){
   await ensureExportLibs();
   if(document.fonts && document.fonts.ready) await document.fonts.ready;
 
-  const imgs=[el("artImg"), el("prevThumb"), el("setIconImg"), ...document.querySelectorAll(".card-socials .icon")].filter(Boolean);
+  // NEW: inline social icons as real <svg> nodes so exporters capture them perfectly
+  await inlineSocialSVGIcons(card);
+
+  const imgs=[el("artImg"), el("prevThumb"), el("setIconImg")].filter(Boolean);
   await Promise.all(imgs.map(i=> i && i.src && !i.complete ? new Promise(r=>i.addEventListener("load",r,{once:true})) : Promise.resolve()));
 
-  const cs=getComputedStyle(card); const top=(cs.getPropertyValue('--bg-top')||'#0a0d10').trim(); const bottom=(cs.getPropertyValue('--bg-bottom')||'#0b0f12').trim();
-  card.style.setProperty('--bg-top', top); card.style.setProperty('--bg-bottom', bottom); card.style.backgroundImage=`linear-gradient(180deg, ${top}, ${bottom})`;
+  const cs=getComputedStyle(card);
+  const top=(cs.getPropertyValue('--bg-top')||'#0a0d10').trim();
+  const bottom=(cs.getPropertyValue('--bg-bottom')||'#0b0f12').trim();
+  card.style.setProperty('--bg-top', top);
+  card.style.setProperty('--bg-bottom', bottom);
+  card.style.backgroundImage=`linear-gradient(180deg, ${top}, ${bottom})`;
 
   const filename=(state.name||'card')+'.png';
   const viewportCard = document.querySelector(".card-viewport > .card") || card;
@@ -360,24 +432,21 @@ function triggerDownload(dataUrl, filename){ const a=document.createElement('a')
 /* Reset */
 function resetForm(){
   Object.keys(state).forEach(k=>state[k]="");
-  state.element="calm"; state.stage="base"; state.rarity="common"; state.layout="standard";
+  state.element="calm"; state.stage="base"; state.rarity="common"; state.layout="standard"; state.rarityColorOverride=false;
 
   setLayout("standard");
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
 
-  // reset BG pickers
   const t=el("bgTop"), b=el("bgBottom");
   if(t) t.value="#0a0d10"; if(b) b.value="#0b0f12";
   updateBgColors();
 
-  // re-init text color swatches to current computed colors
   initTextColorSwatches();
+  syncRarityColorSwatch();
 }
 
 /* Init */
 bindInputs();
-setTimeout(()=>{ // ensure initial visibility correct on first load
-  drawStage();
-  setLayout(el("layoutMode")?.value || "standard");
-},0);
+setLayout("standard");
 drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
+syncRarityColorSwatch();
