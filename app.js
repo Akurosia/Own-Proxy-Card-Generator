@@ -1,4 +1,4 @@
-/* Stream Saga — rarity color picker + extra rarities, grouped fields, export (inline SVG icons) */
+/* Stream Saga — robust rarity color handling (works on GitHub Pages), grouped fields, export */
 
 const el = id => document.getElementById(id);
 
@@ -17,7 +17,8 @@ const state = {
   setName: "",
   rarity: "common",
   artURL: "", prevURL: "", setIconURL: "",
-  rarityColorOverride: false
+  rarityColorOverride: false,
+  rarityColor: "#c9c9c9"   // <— tracked explicitly; no getComputedStyle needed
 };
 
 function bindInputs(){
@@ -47,7 +48,13 @@ function bindInputs(){
 
     ["numXY","input", v => { state.numXY=v; drawCredit(); }],
     ["setName","input", v => { state.setName=v; drawCredit(); }],
-    ["rarity","change", v => { state.rarity=v; state.rarityColorOverride=false; drawCredit(); syncRarityColorSwatch(); }],
+    ["rarity","change", v => {
+      state.rarity=v;
+      state.rarityColorOverride=false;           // snap back to default color for this rarity
+      state.rarityColor = currentRarityDefaultColor(state.rarity);
+      drawCredit();
+      syncRarityColorSwatch();
+    }],
   ];
   map.forEach(([id,ev,fn])=>{
     const n=el(id);
@@ -67,12 +74,16 @@ function bindInputs(){
   // Per-field text colors (includes socials)
   initTextColorSwatches();
 
-  // RARITY color picker
+  // RARITY color picker (swatch sits on same row as dropdown)
   setupSwatch("c_rarity","c_raritySw", ()=> {
     const val = el("c_rarity").value;
     const svg = el("rarityIcon");
-    if(svg){ svg.style.fill = val; }
+    state.rarityColor = val;
     state.rarityColorOverride = true;
+    if(svg){
+      svg.style.fill = val;
+      Array.from(svg.children).forEach(ch => ch.setAttribute('fill', val));
+    }
   });
 
   // buttons
@@ -216,7 +227,7 @@ function drawAttack2(){
 }
 function drawFlavour(){ el("flavourText").textContent=state.flavour || ""; }
 
-/* Rarity drawing (shapes + default colors, supports override) */
+/* Rarity drawing (shapes + robust color application) */
 function drawCredit(){
   el("setNameText").textContent=state.setName||""; el("numOut").textContent=state.numXY||"";
 
@@ -241,7 +252,17 @@ function drawCredit(){
   }
   rarityIcon.innerHTML = svg;
 
-  const defaultFill = {
+  const defaultFill = currentRarityDefaultColor(r);
+  const colorToUse = state.rarityColorOverride ? (state.rarityColor || defaultFill) : defaultFill;
+
+  // Apply via style AND attributes for maximum compatibility
+  rarityIcon.style.fill = colorToUse;
+  Array.from(rarityIcon.children).forEach(ch => ch.setAttribute('fill', colorToUse));
+}
+
+/* Helper: default color per rarity (no computed style) */
+function currentRarityDefaultColor(r){
+  return ({
     common:"#c9c9c9",
     uncommon:"#8cd6ff",
     rare:"#ffd700",
@@ -249,49 +270,36 @@ function drawCredit(){
     epic:"#b388ff",
     mythic:"#ff9f43",
     secret:"#2fd2c9"
-  }[r] || "#c9c9c9";
-
-  if(!state.rarityColorOverride){
-    rarityIcon.style.fill = defaultFill;
-  }
+  }[r] || "#c9c9c9");
 }
 
-/* === NEW: Replace social <img class="icon" src="*.svg"> with inline <svg> nodes === */
+/* === Inline social icons as real <svg> nodes so exporters capture them === */
 async function inlineSocialSVGIcons(root){
   const imgs = Array.from(root.querySelectorAll("img.icon"));
-  const svgImgs = imgs.filter(img => {
-    const src = img.getAttribute("src") || "";
-    return /\.svg(\?.*)?$/i.test(src);
-  });
+  const svgImgs = imgs.filter(img => /\.svg(\?.*)?$/i.test(img.getAttribute("src") || ""));
   await Promise.all(svgImgs.map(async img => {
     try{
       const res = await fetch(img.src, {cache:"no-store"});
       const text = await res.text();
 
-      // Parse SVG safely
       const parser = new DOMParser();
       const doc = parser.parseFromString(text, "image/svg+xml");
       const svg = doc.documentElement;
-
       if(!svg || svg.nodeName.toLowerCase() !== "svg") return;
 
-      // Clean potentially problematic attributes
       svg.removeAttribute("width");
       svg.removeAttribute("height");
       svg.setAttribute("preserveAspectRatio","xMidYMid meet");
 
-      // Carry over classes and ARIA
       const cls = (img.getAttribute("class")||"") + " svg-inline";
       svg.setAttribute("class", cls.trim());
       const alt = img.getAttribute("alt") || "";
       if(alt){ svg.setAttribute("role","img"); svg.setAttribute("aria-label", alt); }
 
-      // Constrain size via inline style so exporters respect it
       svg.style.width = (getComputedStyle(img).width || "18px");
       svg.style.height = (getComputedStyle(img).height || "18px");
       svg.style.display = "block";
 
-      // Replace <img> with <svg>
       img.replaceWith(svg);
     }catch(e){
       console.warn("Inline SVG failed for", img.src, e);
@@ -309,13 +317,14 @@ function toHex(rgb){
   return `#${r}${g}${b}`;
 }
 function syncRarityColorSwatch(){
-  const svg = el("rarityIcon");
   const input = el("c_rarity");
   const swBtn = el("c_raritySw");
-  if(!svg || !input || !swBtn) return;
-  const cur = toHex(getComputedStyle(svg).fill || "#c9c9c9");
-  input.value = cur;
-  const box = swBtn.querySelector('.swatch'); if(box) box.style.background = cur;
+  if(!input || !swBtn) return;
+  const color = state.rarityColorOverride
+    ? (state.rarityColor || currentRarityDefaultColor(state.rarity))
+    : currentRarityDefaultColor(state.rarity);
+  input.value = color;
+  const box = swBtn.querySelector('.swatch'); if(box) box.style.background = color;
 }
 
 /* Prefills */
@@ -325,6 +334,7 @@ function prefillNormal(){
   state.name="Neon Duck"; state.nameMod="EX"; state.element="chaotic"; state.stage="step1";
   state.youtube="NeonDuckYT"; state.twitch="NeonDuckLive"; state.instagram="neon.duck";
   state.numXY="12/99"; state.setName="Night Circuit"; state.rarity="rare"; state.rarityColorOverride=false;
+  state.rarityColor = currentRarityDefaultColor(state.rarity);
 
   state.abilityName="Overclock Aura"; state.abilityText="Once per turn, your next attack deals +20 if you changed a setting.";
   state.attackName="Circuit Peck"; state.attackValue="70"; state.attackEffect="Flip a coin. If heads, the target is stunned next turn.";
@@ -347,6 +357,7 @@ function prefillFullArt(){
   state.name="Skyline Duck"; state.nameMod="MAX"; state.element="friendly"; state.stage="base";
   state.youtube="SkylineStreams"; state.twitch="SkylineDuck"; state.instagram="sky.duck";
   state.numXY="01/45"; state.setName="City Lights"; state.rarity="ultra"; state.rarityColorOverride=false;
+  state.rarityColor = currentRarityDefaultColor(state.rarity);
 
   state.abilityName="City Sync"; state.abilityText="While this card is Active, your attacks cost 1 less energy if you streamed this turn.";
   state.attackName="Billboard Bash"; state.attackValue="110"; state.attackEffect="If you have more followers than your opponent, draw a card.";
@@ -372,7 +383,7 @@ function prefillFullArt(){
   syncRarityColorSwatch();
 }
 
-/* Export libs */
+/* Export libs (load from your assets root or same folder) */
 function loadScript(src){
   return new Promise((res,rej)=>{
     if(document.querySelector('script[src="'+src+'"]')) return res();
@@ -394,7 +405,7 @@ async function downloadPNG(){
   await ensureExportLibs();
   if(document.fonts && document.fonts.ready) await document.fonts.ready;
 
-  // NEW: inline social icons as real <svg> nodes so exporters capture them perfectly
+  // inline social icons as real <svg> nodes so exporters capture them
   await inlineSocialSVGIcons(card);
 
   const imgs=[el("artImg"), el("prevThumb"), el("setIconImg")].filter(Boolean);
@@ -432,7 +443,8 @@ function triggerDownload(dataUrl, filename){ const a=document.createElement('a')
 /* Reset */
 function resetForm(){
   Object.keys(state).forEach(k=>state[k]="");
-  state.element="calm"; state.stage="base"; state.rarity="common"; state.layout="standard"; state.rarityColorOverride=false;
+  state.element="calm"; state.stage="base"; state.rarity="common"; state.layout="standard";
+  state.rarityColorOverride=false; state.rarityColor=currentRarityDefaultColor(state.rarity);
 
   setLayout("standard");
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
@@ -448,5 +460,6 @@ function resetForm(){
 /* Init */
 bindInputs();
 setLayout("standard");
+state.rarityColor = currentRarityDefaultColor(state.rarity);
 drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
 syncRarityColorSwatch();
