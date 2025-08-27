@@ -238,7 +238,7 @@
       <h1>Details</h1>
 
       <div class="grid">
-        <!-- (unchanged right panel content) -->
+        <!-- Ability -->
         <label class="form-row row-3">
           <span class="lab">Ability Name</span>
           <input id="abilityName" type="text" placeholder="e.g. Overclock Aura" />
@@ -257,6 +257,7 @@
           </div>
         </label>
 
+        <!-- Attack 1 -->
         <label class="form-row row-3">
           <span class="lab">Attack #1 Name</span>
           <input id="attackName" type="text" placeholder="e.g. Circuit Peck" />
@@ -284,6 +285,7 @@
           </div>
         </label>
 
+        <!-- Attack 2 -->
         <label class="form-row row-3">
           <span class="lab">Attack #2 Name</span>
           <input id="attack2Name" type="text" placeholder="e.g. Neon Burst" />
@@ -335,6 +337,7 @@
           </div>
         </label>
 
+        <!-- Rarity + custom color -->
         <label class="form-row row-2">
           <span class="lab">Rarity</span>
           <select id="rarity">
@@ -342,7 +345,18 @@
             <option value="uncommon">Uncommon</option>
             <option value="rare">Rare</option>
             <option value="ultra">Ultra</option>
+            <option value="epic">Epic</option>
+            <option value="mythic">Mythic</option>
+            <option value="secret">Secret</option>
           </select>
+        </label>
+
+        <label class="form-row row-2">
+          <span class="lab">Rarity Color</span>
+          <div class="color-input solo">
+            <input id="c_rarity" class="hidden-color" type="color" value="#c9c9c9">
+            <button id="c_raritySw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
 
         <label class="form-row row-3">
