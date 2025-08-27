@@ -1,19 +1,13 @@
-/* Stream Saga – Panels aligned, color swatches, fixed credit center */
+/* Stream Saga – Panels aligned + compact rows + swatch-only color pickers */
 
-/* >>> Your CSS exactly, with one tiny fix:
-   - Remove undefined --panel-w and set min-width per panel side. <<< */
-
+/* keep your variables exactly */
 :root{
   --bg:#0b0f12; --panel:#12171c; --ink:#d4e1ee; --muted:#8ea0b2; --line:#1c232b;
   --blue:#39b8ff; --red:#ff3b3b;
 
-  /* Card base size (logical pixels for export) */
   --card-w:744px; --card-h:1038px;
-
-  /* Display scale so the card fits on 1080p screens */
   --card-scale: 0.84;
 
-  /* Panel width for alignment */
   --panel-w-r: 320px;
   --panel-w-l: 415px;
 
@@ -28,83 +22,79 @@
 body{margin:0;background:#070b0f;color:var(--ink);font:400 13.5px/1.45 var(--font-ui)}
 *{box-sizing:border-box}
 
-/* Layout — three clean columns with exact middle width = card viewport */
+/* Layout */
 .wrap{
   display:grid;
   grid-template-columns: var(--panel-w-l) calc(var(--card-w) * var(--card-scale)) var(--panel-w-r);
   gap: 20px;
-  justify-content:center;        /* keep trio centered */
-  align-items:start;             /* top-align all three columns */
-  margin:20px auto;
-  padding-bottom:20px;
-  width: 100%;
-  max-width: 100vw;
+  justify-content:center; align-items:start;
+  margin:20px auto; padding-bottom:20px; width:100%; max-width:100vw;
 }
-@media (max-width: 1100px){
-  .wrap{
-    grid-template-columns: 1fr;
-    justify-content: stretch;
-  }
-  .panel-left{order:-2}
-  .canvasZone{order:-1}
-  .panel-right{order:0}
+@media (max-width:1100px){
+  .wrap{ grid-template-columns:1fr }
+  .panel-left{order:-2}.canvasZone{order:-1}.panel-right{order:0}
 }
 
 /* Panels */
 .panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px;
-  box-shadow:var(--shadow-outer);
-  width:fit-content;
-  max-height:calc(100vh - 40px);
-  overflow:auto;
+  background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px;
+  box-shadow:var(--shadow-outer); width:fit-content; max-height:calc(100vh - 40px); overflow:auto;
 }
-/* FIX: per-side min widths to match your custom vars */
-.panel-left{ min-width: var(--panel-w-l); }
-.panel-right{ min-width: var(--panel-w-r); }
+.panel-left{ min-width:var(--panel-w-l) } .panel-right{ min-width:var(--panel-w-r) }
+.panel h1{font:700 20px/1 var(--font-display); margin:0 0 12px}
 
-.panel h1{font:700 20px/1 var(--font-display);margin:0 0 12px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.col2{grid-column:1/-1}
-label{display:flex;flex-direction:column;gap:8px}
+/* Grid containers become vertical stacks */
+.grid{ display:flex; flex-direction:column; gap:12px }
+
+/* Row types */
+.form-row{ width:100% }
+.form-row .lab{ color:#bcd0e2; font:700 12px var(--font-display) }
+.row-2{ display:grid; grid-template-columns: 140px 1fr; align-items:center; gap:10px }
+.row-3{ display:grid; grid-template-columns: 140px 1fr 40px; align-items:center; gap:10px }
+
+/* Social rows (ICON : LABEL : FIELD) */
+.socials{ border:1px solid #141a21; border-radius:12px; padding:12px }
+legend{ padding:0 6px; color:#bcd0e2; font:700 12px var(--font-display) }
+.social-row{ grid-template-columns: 28px 110px 1fr }
+.icon-sm{ width:20px; height:20px; opacity:.95 }
+
+/* Inputs */
 input,select,textarea{background:#0e1419;border:1px solid #141a21;border-radius:10px;padding:8px 10px;color:var(--ink)}
 textarea{resize:vertical}
-fieldset{border:1px solid #141a21;border-radius:12px;padding:12px}
-legend{padding:0 6px;color:#bcd0e2;font:700 12px var(--font-display)}
 
-/* Color swatch row */
-.color-input{display:flex;align-items:center;gap:8px}
-.swatch{width:22px;height:22px;border-radius:6px;border:1px solid #2a3541;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+/* Name field icon */
+.input-with-icon{ display:flex; align-items:center; gap:8px }
+.mini-icon{ width:18px; height:18px; color:#8cd6ff; }
+
+/* Color controls — hide native input; show only square swatch button */
+.hidden-color{
+  position:absolute !important; width:0 !important; height:0 !important;
+  opacity:0 !important; pointer-events:none !important; border:0 !important; padding:0 !important;
+}
+.swatch-btn{
+  width:28px; height:28px; border:1px solid #2a3541; border-radius:6px;
+  background:#0e1419; padding:0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.swatch-btn .swatch{ width:20px; height:20px; border-radius:4px; border:1px solid #2a3541 }
+.color-input.solo{ display:flex; align-items:center; gap:8px }
 
 /* Canvas & buttons */
 .canvasZone{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
-.card-viewport{
-  width: calc(var(--card-w) * var(--card-scale));
-  height: calc(var(--card-h) * var(--card-scale));
-  display:flex; align-items:flex-start; justify-content:center;
-}
-.card-viewport > .card{ transform: scale(var(--card-scale)); transform-origin: top center; }
-
+.card-viewport{ width:calc(var(--card-w)*var(--card-scale)); height:calc(var(--card-h)*var(--card-scale)); display:flex; align-items:flex-start; justify-content:center }
+.card-viewport>.card{ transform:scale(var(--card-scale)); transform-origin:top center }
 .buttons-center{display:flex;gap:10px;flex-wrap:wrap}
 button{border:1px solid #1a2129;background:#0f151a;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer;font:700 12px var(--font-display)}
 button:hover{border-color:#293544}
 .exportNote{color:#8ea0b2;font-size:12px}
 
-/* Card (base) */
-.card{
-  width: var(--card-w);
-  height: var(--card-h);
-  border-radius:var(--radius-lg);
-  border:2px solid #1a2129;
-  box-shadow:var(--shadow-inset),var(--shadow-outer);
-  position:relative; overflow:hidden;
+/* Card visuals (unchanged from prior good version) */
+.card{ width:var(--card-w); height:var(--card-h); border-radius:var(--radius-lg); border:2px solid #1a2129;
+  box-shadow:var(--shadow-inset),var(--shadow-outer); position:relative; overflow:hidden;
   background:linear-gradient(180deg,var(--bg-top,#0a0d10),var(--bg-bottom,#0b0f12));
 }
 .card-inner{position:absolute;inset:14px;border-radius:20px;z-index:0;border:1px solid #171d24;background:repeating-linear-gradient(135deg,#0e1318 0 10px,#0e1419 10px 20px);opacity:.25}
 
-/* Frame corners (active radius 26px) */
+/* Frame corners radius 26px */
 .frame{position:absolute;inset:10px;z-index:1;pointer-events:none}
 .frame-corner{position:absolute;width:60px;height:60px}
 .frame-corner::before{content:"";position:absolute;inset:0;border:2px solid;background:transparent}
@@ -116,7 +106,6 @@ button:hover{border-color:#293544}
 /* Header */
 .card-head{position:relative;z-index:2;display:grid;grid-template-columns:110px 1fr 150px;align-items:center;padding:18px 24px 10px}
 .badge.element{padding:6px 9px;border-radius:10px;border:1px solid #182029;background:#0f1419;font:700 13px var(--font-display);text-transform:uppercase}
-.badge.calm{color:#a7d9ff}.badge.busy{color:#ffb1b1}.badge.friendly{color:#b9ffb7}.badge.chaotic{color:#ffb7ff}
 .title{display:flex;gap:8px;justify-content:center}
 #titleName{font:700 28px var(--font-display);color:#cfe8ff}
 #titleMod{font:800 22px var(--font-display);padding:2px 8px;border:1px solid #182029;border-radius:8px;background:#0e1419;color:#8cd6ff}
@@ -124,20 +113,16 @@ button:hover{border-color:#293544}
 .stage{justify-self:end;display:flex;align-items:center;gap:8px}
 .stage img{display:none;width:40px;height:40px;border-radius:8px}
 
-/* Art (standard) */
+/* Art & content */
 .card-art{position:relative;z-index:1;margin:8px 24px 0;height:500px;border-radius:var(--radius-md);overflow:hidden;border:1px solid #141b22;background:#0f1317}
 .card-art img{width:100%;height:100%;object-fit:cover}
-
-/* Spacer (for Full Art to preserve flow) */
 .art-spacer{display:none}
 
-/* Socials */
 .card-socials{display:flex;justify-content:center;align-items:center;gap:16px;margin:12px 24px 0;padding:8px 10px;border:1px solid #141b22;border-radius:12px;background:#0f1419}
 .socialItem{display:flex;align-items:center;gap:8px;color:#b7ccde;font:700 12px var(--font-display)}
 .socialItem span:empty{display:none}
 .socialItem .icon{display:block;width:18px;height:18px}
 
-/* Ability & Attacks */
 .card-ability,.card-attack{position:relative;z-index:2;margin:12px 24px 0;padding:8px 10px;border:1px solid #141b22;border-radius:10px;background:#0f1419;display:none}
 .aa-head{display:flex;gap:8px;align-items:center;justify-content:flex-start;color:#cfe8ff}
 .aa-title{font:700 15px var(--font-display)}
@@ -145,11 +130,10 @@ button:hover{border-color:#293544}
 .card-attack .value{margin-left:auto;font:800 17px var(--font-display);color:#ffd8d8}
 .card-ability p,.card-attack p{margin:6px 0 0;color:#b1c6d9;font:400 12.5px var(--font-ui)}
 
-/* Flavour bottom */
 .card-flavour{position:absolute;left:22px;right:22px;bottom:calc(60px + 10px);padding:10px;font-style:italic;text-align:center;border-left:3px solid #1d2a34;background:#0e1318;border-radius:10px;z-index:2}
 .card-flavour:empty{display:none}
 
-/* Credit bar (center pinned) */
+/* Credit bar */
 .card-credit{
   position:absolute;left:22px;right:22px;bottom:12px;height:60px;
   display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;
@@ -161,17 +145,11 @@ button:hover{border-color:#293544}
 .card-credit .credit-right{display:flex;align-items:center;gap:10px;justify-self:end}
 .card-credit .credit-right #numOut{color:#cfe4ff;font:700 12px var(--font-display)}
 .card-credit .credit-right .rarity svg{width:18px;height:18px;fill:#c9c9c9}
-
-/* Fix the center exactly in the middle regardless of left/right width */
-.card-credit{position:absolute}
-.card-credit .credit-center{
-  position:absolute; left:50%; transform:translateX(-50%);
-  white-space:nowrap; text-align:center; pointer-events:none; color:#8ea0b2;
-}
+.card-credit .credit-center{ position:absolute; left:50%; transform:translateX(-50%); white-space:nowrap; text-align:center; pointer-events:none; color:#8ea0b2 }
 
 .rarity.common svg{fill:#c9c9c9}.rarity.uncommon svg{fill:#8cd6ff}.rarity.rare svg{fill:#ffd700}.rarity.ultra svg{fill:#ff3b3b}
 
-/* -------- Full Art (art behind; positions preserved) -------- */
+/* Full Art variant */
 .card.fullart .card-inner{display:none;}
 .card.fullart .card-art{ position:absolute; inset:0; margin:0; height:auto; border:none; border-radius:inherit; z-index:0; }
 .card.fullart .card-art img{object-fit:cover}
@@ -190,6 +168,4 @@ button:hover{border-color:#293544}
 }
 
 /* Short screens */
-@media (max-height: 900px){
-  :root{ --card-scale: 0.78; }
-}
+@media (max-height:900px){ :root{ --card-scale:0.78 } }

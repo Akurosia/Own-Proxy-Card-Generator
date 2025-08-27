@@ -1,4 +1,4 @@
-/* Stream Saga — unchanged logic; footer fields now live in right panel */
+/* Stream Saga — per-field color swatches, compact rows, socials as ICON:LABEL:FIELD */
 
 const el = id => document.getElementById(id);
 
@@ -26,10 +26,6 @@ function bindInputs(){
     ["element","change", v => { state.element=v; drawElement(); }],
     ["stage","change", v => { state.stage=v; drawStage(); }],
     ["layoutMode","change", v => { setLayout(v); }],
-    // footer fields (now right panel)
-    ["numXY","input", v => { state.numXY=v; drawCredit(); }],
-    ["setName","input", v => { state.setName=v; drawCredit(); }],
-    ["rarity","change", v => { state.rarity=v; drawCredit(); }],
 
     ["youtube","input", v => { state.youtube=v; drawSocials(); }],
     ["twitch","input", v => { state.twitch=v; drawSocials(); }],
@@ -47,6 +43,10 @@ function bindInputs(){
     ["attack2Effect","input", v => { state.attack2Effect=v; drawAttack2(); }],
 
     ["flavour","input", v => { state.flavour=v; drawFlavour(); }],
+
+    ["numXY","input", v => { state.numXY=v; drawCredit(); }],
+    ["setName","input", v => { state.setName=v; drawCredit(); }],
+    ["rarity","change", v => { state.rarity=v; drawCredit(); }],
   ];
   map.forEach(([id,ev,fn])=>{
     const n=el(id);
@@ -58,19 +58,13 @@ function bindInputs(){
   el("prevImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.prevURL=url; drawStage(); }));
   el("setIcon").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.setIconURL=url; drawCredit(); }));
 
-  // background colors + swatches
-  const updateColors = () => {
-    const top = el("bgTop").value || "#0a0d10";
-    const bot = el("bgBottom").value || "#0b0f12";
-    const card = el("card");
-    card.style.setProperty("--bg-top", top);
-    card.style.setProperty("--bg-bottom", bot);
-    const tSw = el("bgTopSwatch"); if(tSw) tSw.style.background = top;
-    const bSw = el("bgBottomSwatch"); if(bSw) bSw.style.background = bot;
-  };
-  el("bgTop").addEventListener("input", updateColors);
-  el("bgBottom").addEventListener("input", updateColors);
-  updateColors();
+  // BG color swatches (swatch-only)
+  setupSwatch("bgTop","bgTopSwatch", updateBgColors);
+  setupSwatch("bgBottom","bgBottomSwatch", updateBgColors);
+  updateBgColors();
+
+  // Per-field text colors
+  initTextColorSwatches();
 
   // buttons
   el("resetBtn").addEventListener("click", resetForm);
@@ -84,6 +78,61 @@ function loadFile(file, cb){
   const r=new FileReader();
   r.onload=()=>cb(r.result);
   r.readAsDataURL(file);
+}
+
+/* Swatch-only helpers */
+function setupSwatch(inputId, swatchBtnId, onChange){
+  const input = el(inputId);
+  const btn = el(swatchBtnId);
+  if(!input || !btn) return;
+  const box = btn.querySelector('.swatch');
+  const sync = ()=>{ if(box) box.style.background = input.value || "#000"; if(onChange) onChange(); };
+  btn.addEventListener('click', ()=> input.click());
+  input.addEventListener('input', sync);
+  sync();
+}
+
+/* Text color swatches mapping: inputId/swatchId/targetSelector */
+const textColorMap = [
+  ["c_name","c_nameSw","#titleName"],
+  ["c_abilityName","c_abilityNameSw","#abilityTitle"],
+  ["c_abilityText","c_abilityTextSw","#abilityDesc"],
+  ["c_attackName","c_attackNameSw","#attackTitle"],
+  ["c_attackValue","c_attackValueSw","#attackVal"],
+  ["c_attackEffect","c_attackEffectSw","#attackEffectText"],
+  ["c_attack2Name","c_attack2NameSw","#attack2Title"],
+  ["c_attack2Value","c_attack2ValueSw","#attack2Val"],
+  ["c_attack2Effect","c_attack2EffectSw","#attack2EffectText"],
+  ["c_flavour","c_flavourSw","#flavourText"],
+  ["c_numXY","c_numXYSw","#numOut"],
+  ["c_setName","c_setNameSw","#setNameText"],
+];
+
+function initTextColorSwatches(){
+  textColorMap.forEach(([inputId, swId, targetSel])=>{
+    const input = el(inputId), sw = el(swId), target = document.querySelector(targetSel);
+    if(!input || !sw || !target) return;
+    // derive current color
+    const cur = toHex(getComputedStyle(target).color);
+    input.value = cur;
+    const box = sw.querySelector('.swatch'); if(box) box.style.background = cur;
+    // wire
+    sw.addEventListener('click', ()=> input.click());
+    input.addEventListener('input', ()=> {
+      const val = input.value;
+      if(box) box.style.background = val;
+      target.style.color = val;
+    });
+  });
+}
+
+/* Background gradient */
+function updateBgColors(){
+  const top = el("bgTop").value || "#0a0d10";
+  const bot = el("bgBottom").value || "#0b0f12";
+  const card = el("card");
+  card.style.setProperty("--bg-top", top);
+  card.style.setProperty("--bg-bottom", bot);
 }
 
 /* Layout toggle */
@@ -151,7 +200,17 @@ function drawCredit(){
   el("rarityIcon").innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
 }
 
-/* Demo helpers */
+/* utils */
+function toHex(rgb){
+  const m = rgb && rgb.match && rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if(!m) return "#ffffff";
+  const r = (+m[1]).toString(16).padStart(2,"0");
+  const g = (+m[2]).toString(16).padStart(2,"0");
+  const b = (+m[3]).toString(16).padStart(2,"0");
+  return `#${r}${g}${b}`;
+}
+
+/* Demo helpers and export (unchanged from previous working version) */
 function makeDataImage(w,h,draw){ const c=document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d'); draw(ctx,w,h); return c.toDataURL('image/png'); }
 function prefillNormal(){
   const set=(id,val)=>{ const n=el(id); if(n) n.value=val; };
@@ -166,7 +225,6 @@ function prefillNormal(){
   state.attack2Name="Neon Burst"; state.attack2Value="90"; state.attack2Effect="Discard 1 card at random from your hand.";
   state.flavour="Raised on city neon and late-night streams, this duck quacks in binary and dreams in blue-and-red.";
 
-  set("layoutMode","standard");
   ["name","nameMod","element","stage","youtube","twitch","instagram","numXY","setName","rarity","abilityName","abilityText","attackName","attackValue","attackEffect","attack2Name","attack2Value","attack2Effect","flavour"]
     .forEach(id=>el(id)&& (el(id).value=state[id] ?? ""));
 
@@ -175,8 +233,10 @@ function prefillNormal(){
   state.prevURL = makeDataImage(256,256,(ctx,w,h)=>{ const g=ctx.createLinearGradient(0,0,w,0); g.addColorStop(0,'#111b24'); g.addColorStop(1,'#2a1a1a'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h); });
 
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
-}
 
+  // re-init color swatches to reflect current computed colors
+  initTextColorSwatches();
+}
 function prefillFullArt(){
   const set=(id,val)=>{ const n=el(id); if(n) n.value=val; };
 
@@ -190,7 +250,6 @@ function prefillFullArt(){
   state.attack2Name="Overtime Glow"; state.attack2Value="60"; state.attack2Effect="Heal 20 damage from one of your benched allies.";
   state.flavour="Lit by the skyline, boosted by chat—this duck never logs off.";
 
-  set("layoutMode","full");
   ["name","nameMod","element","stage","youtube","twitch","instagram","numXY","setName","rarity","abilityName","abilityText","attackName","attackValue","attackEffect","attack2Name","attack2Value","attack2Effect","flavour"]
     .forEach(id=>el(id)&& (el(id).value=state[id] ?? ""));
 
@@ -206,9 +265,10 @@ function prefillFullArt(){
   state.prevURL = "";
 
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
+  initTextColorSwatches();
 }
 
-/* Export libs — local files */
+/* Export libs */
 function loadScript(src){
   return new Promise((res,rej)=>{
     if(document.querySelector('script[src="'+src+'"]')) return res();
@@ -222,7 +282,7 @@ async function ensureExportLibs(){
   if(!window.domtoimage) await loadScript('dom-to-image-more.js');
 }
 
-/* Export */
+/* Export PNG */
 async function downloadPNG(){
   const card = el("card");
   if(!card) return;
@@ -262,13 +322,17 @@ function triggerDownload(dataUrl, filename){ const a=document.createElement('a')
 function resetForm(){
   Object.keys(state).forEach(k=>state[k]="");
   state.element="calm"; state.stage="base"; state.rarity="common"; state.layout="standard";
+
   setLayout("standard");
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
 
+  // reset BG pickers
   const t=el("bgTop"), b=el("bgBottom");
   if(t) t.value="#0a0d10"; if(b) b.value="#0b0f12";
-  const tSw = el("bgTopSwatch"); if(tSw) tSw.style.background = t.value;
-  const bSw = el("bgBottomSwatch"); if(bSw) bSw.style.background = b.value;
+  updateBgColors();
+
+  // re-init text color swatches to current computed colors
+  initTextColorSwatches();
 }
 
 /* Init */

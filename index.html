@@ -16,13 +16,24 @@
       <h1>Basics</h1>
 
       <div class="grid">
-        <label>
-          Name
-          <input id="name" type="text" placeholder="e.g. Neon Duck" />
+        <!-- Name (LABEL : FIELD(with icon) : COLOR) -->
+        <label class="form-row row-3">
+          <span class="lab">Name</span>
+          <div class="input-with-icon">
+            <svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5c-2.6 0-4.8 1.9-5.2 4.4-.1.7-.6 1.4-1.2 1.7l-1.3.7c-.7.4-.6 1.5.2 1.8 1.6.6 3 .8 4.4.7 1.7-.2 3.2-.9 4.4-2 1.1 1 2.6 1.7 4.3 1.9 1.5.2 3-.1 4.6-.8.8-.3.9-1.4.2-1.8l-1.5-.8c-.5-.3-.9-.8-1-1.3-.6-2.7-3-4.7-5.9-4.7zM9.5 20.5c-1.1 0-2-.9-2-2h9c0 1.1-.9 2-2 2h-5z" fill="currentColor"/>
+            </svg>
+            <input id="name" type="text" placeholder="e.g. Neon Duck" />
+          </div>
+          <div class="color-cell">
+            <input id="c_name" type="color" class="hidden-color">
+            <button id="c_nameSw" type="button" class="swatch-btn"><span class="swatch"></span></button>
+          </div>
         </label>
 
-        <label>
-          Name Modifier
+        <!-- Name Modifier (LABEL : FIELD) -->
+        <label class="form-row row-2">
+          <span class="lab">Name Modifier</span>
           <select id="nameMod">
             <option value="">(none)</option>
             <option value="EX">EX</option>
@@ -32,8 +43,9 @@
           </select>
         </label>
 
-        <label>
-          Element
+        <!-- Element (LABEL : FIELD) -->
+        <label class="form-row row-2">
+          <span class="lab">Element</span>
           <select id="element">
             <option value="calm">Calm</option>
             <option value="busy">Busy</option>
@@ -42,8 +54,9 @@
           </select>
         </label>
 
-        <label>
-          Type / Stage
+        <!-- Type/Stage -->
+        <label class="form-row row-2">
+          <span class="lab">Type / Stage</span>
           <select id="stage">
             <option value="base">Base</option>
             <option value="step1">Step 1</option>
@@ -51,59 +64,74 @@
           </select>
         </label>
 
-        <label>
-          Layout
+        <!-- Layout -->
+        <label class="form-row row-2">
+          <span class="lab">Layout</span>
           <select id="layoutMode">
             <option value="standard">Standard</option>
             <option value="full">Full Art</option>
           </select>
         </label>
 
-        <label class="col2">
-          Previous Stage Image
+        <!-- Previous Stage Image -->
+        <label class="form-row row-2">
+          <span class="lab">Previous Stage Image</span>
           <input id="prevImg" type="file" accept="image/*" />
         </label>
 
-        <label class="col2">
-          Card Artwork (main image)
+        <!-- Card Artwork -->
+        <label class="form-row row-2">
+          <span class="lab">Card Artwork</span>
           <input id="mainImg" type="file" accept="image/*" />
         </label>
 
-        <fieldset class="col2 socials">
+        <!-- Socials (ICON : LABEL : FIELD) -->
+        <fieldset class="col1 socials">
           <legend>Socials</legend>
-          <label>
-            <span>YouTube</span>
+
+          <div class="form-row row-3 social-row">
+            <img class="icon-sm" src="assets/youtube.svg" alt="">
+            <span class="lab">YouTube</span>
             <input id="youtube" type="text" placeholder="YouTube name" />
-          </label>
-          <label>
-            <span>Twitch</span>
+          </div>
+
+          <div class="form-row row-3 social-row">
+            <img class="icon-sm" src="assets/twitch.svg" alt="">
+            <span class="lab">Twitch</span>
             <input id="twitch" type="text" placeholder="Twitch name" />
-          </label>
-          <label>
-            <span>Instagram</span>
+          </div>
+
+          <div class="form-row row-3 social-row">
+            <img class="icon-sm" src="assets/instagram.svg" alt="">
+            <span class="lab">Instagram</span>
             <input id="instagram" type="text" placeholder="Instagram name" />
-          </label>
+          </div>
         </fieldset>
 
-        <!-- Background colors (with live swatches) -->
-        <label class="color-picker">
-          BG Top Color
-          <div class="color-input">
-            <input id="bgTop" type="color" value="#0a0d10">
-            <span id="bgTopSwatch" class="swatch" title="Top color"></span>
+        <!-- Background colors (swatch-only) -->
+        <div class="form-row row-2">
+          <span class="lab">BG Top Color</span>
+          <div class="color-input solo">
+            <input id="bgTop" class="hidden-color" type="color" value="#0a0d10">
+            <button id="bgTopSwatch" class="swatch-btn" type="button" aria-label="Pick top color">
+              <span class="swatch"></span>
+            </button>
           </div>
-        </label>
-        <label class="color-picker">
-          BG Bottom Color
-          <div class="color-input">
-            <input id="bgBottom" type="color" value="#0b0f12">
-            <span id="bgBottomSwatch" class="swatch" title="Bottom color"></span>
+        </div>
+
+        <div class="form-row row-2">
+          <span class="lab">BG Bottom Color</span>
+          <div class="color-input solo">
+            <input id="bgBottom" class="hidden-color" type="color" value="#0b0f12">
+            <button id="bgBottomSwatch" class="swatch-btn" type="button" aria-label="Pick bottom color">
+              <span class="swatch"></span>
+            </button>
           </div>
-        </label>
+        </div>
       </div>
     </section>
 
-    <!-- CANVAS (center column) -->
+    <!-- CANVAS -->
     <section class="canvasZone">
       <div class="card-viewport">
         <div class="card" id="card">
@@ -131,11 +159,8 @@
           <div class="card-art">
             <img id="artImg" alt="">
           </div>
-
-          <!-- Spacer to keep layout identical in Full Art -->
           <div class="art-spacer" aria-hidden="true"></div>
 
-          <!-- Social bar -->
           <div class="card-socials">
             <div class="socialItem" data-kind="youtube">
               <img class="icon" src="assets/youtube.svg" alt="YouTube">
@@ -151,7 +176,6 @@
             </div>
           </div>
 
-          <!-- Ability -->
           <section class="card-ability">
             <div class="aa-head aa-ability">
               <span class="ability-flag">ABILITY</span>
@@ -160,7 +184,6 @@
             <p id="abilityDesc"></p>
           </section>
 
-          <!-- Attack #1 -->
           <section class="card-attack attack1">
             <div class="aa-head">
               <span id="attackTitle" class="aa-title"></span>
@@ -169,7 +192,6 @@
             <p id="attackEffectText"></p>
           </section>
 
-          <!-- Attack #2 -->
           <section class="card-attack attack2">
             <div class="aa-head">
               <span id="attack2Title" class="aa-title"></span>
@@ -178,10 +200,8 @@
             <p id="attack2EffectText"></p>
           </section>
 
-          <!-- Flavour aligned to bottom -->
           <p class="card-flavour" id="flavourText"></p>
 
-          <!-- Bottom credit bar -->
           <div class="card-credit">
             <div class="credit-left">
               <img id="setIconImg" alt="">
@@ -206,68 +226,118 @@
       <div class="exportNote">What you see is what gets exported.</div>
     </section>
 
-    <!-- RIGHT PANEL — DETAILS & FOOTER FIELDS -->
+    <!-- RIGHT PANEL — DETAILS + FOOTER -->
     <section class="panel panel-right">
       <h1>Details</h1>
 
       <div class="grid">
-        <!-- ABILITY -->
-        <label class="col2">
-          Ability Name
+
+        <!-- Ability -->
+        <label class="form-row row-3">
+          <span class="lab">Ability Name</span>
           <input id="abilityName" type="text" placeholder="e.g. Overclock Aura" />
+          <div class="color-cell">
+            <input id="c_abilityName" type="color" class="hidden-color">
+            <button id="c_abilityNameSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
-        <label class="col2">
-          Ability Text
+
+        <label class="form-row row-3">
+          <span class="lab">Ability Text</span>
           <textarea id="abilityText" rows="2" placeholder="Describe ability…"></textarea>
+          <div class="color-cell">
+            <input id="c_abilityText" type="color" class="hidden-color">
+            <button id="c_abilityTextSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
 
-        <!-- ATTACK 1 -->
-        <label>
-          Attack #1 Name
+        <!-- Attack 1 -->
+        <label class="form-row row-3">
+          <span class="lab">Attack #1 Name</span>
           <input id="attackName" type="text" placeholder="e.g. Circuit Peck" />
+          <div class="color-cell">
+            <input id="c_attackName" type="color" class="hidden-color">
+            <button id="c_attackNameSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
-        <label>
-          Attack #1 Value
+
+        <label class="form-row row-3">
+          <span class="lab">Attack #1 Value</span>
           <input id="attackValue" type="text" placeholder="e.g. 70" />
+          <div class="color-cell">
+            <input id="c_attackValue" type="color" class="hidden-color">
+            <button id="c_attackValueSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
-        <label class="col2">
-          Attack #1 Effect
+
+        <label class="form-row row-3">
+          <span class="lab">Attack #1 Effect</span>
           <textarea id="attackEffect" rows="2" placeholder="Optional effect…"></textarea>
+          <div class="color-cell">
+            <input id="c_attackEffect" type="color" class="hidden-color">
+            <button id="c_attackEffectSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
 
-        <!-- ATTACK 2 -->
-        <label>
-          Attack #2 Name
+        <!-- Attack 2 -->
+        <label class="form-row row-3">
+          <span class="lab">Attack #2 Name</span>
           <input id="attack2Name" type="text" placeholder="e.g. Neon Burst" />
+          <div class="color-cell">
+            <input id="c_attack2Name" type="color" class="hidden-color">
+            <button id="c_attack2NameSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
-        <label>
-          Attack #2 Value
+
+        <label class="form-row row-3">
+          <span class="lab">Attack #2 Value</span>
           <input id="attack2Value" type="text" placeholder="e.g. 90" />
+          <div class="color-cell">
+            <input id="c_attack2Value" type="color" class="hidden-color">
+            <button id="c_attack2ValueSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
-        <label class="col2">
-          Attack #2 Effect
+
+        <label class="form-row row-3">
+          <span class="lab">Attack #2 Effect</span>
           <textarea id="attack2Effect" rows="2" placeholder="Optional effect…"></textarea>
+          <div class="color-cell">
+            <input id="c_attack2Effect" type="color" class="hidden-color">
+            <button id="c_attack2EffectSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
 
-        <!-- FLAVOUR -->
-        <label class="col2">
-          Flavour Text
+        <!-- Flavour -->
+        <label class="form-row row-3">
+          <span class="lab">Flavour Text</span>
           <textarea id="flavour" rows="2" placeholder="Short lore or personality…"></textarea>
+          <div class="color-cell">
+            <input id="c_flavour" type="color" class="hidden-color">
+            <button id="c_flavourSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
 
-        <!-- FOOTER — moved here -->
-        <label>
-          Card Number (X/Y)
+        <!-- Footer -->
+        <label class="form-row row-3">
+          <span class="lab">Card Number (X/Y)</span>
           <input id="numXY" type="text" placeholder="e.g. 12/99" />
+          <div class="color-cell">
+            <input id="c_numXY" type="color" class="hidden-color">
+            <button id="c_numXYSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
 
-        <label>
-          Set Name
+        <label class="form-row row-3">
+          <span class="lab">Set Name</span>
           <input id="setName" type="text" placeholder="e.g. Night Circuit" />
+          <div class="color-cell">
+            <input id="c_setName" type="color" class="hidden-color">
+            <button id="c_setNameSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
+          </div>
         </label>
 
-        <label>
-          Rarity
+        <label class="form-row row-2">
+          <span class="lab">Rarity</span>
           <select id="rarity">
             <option value="common">Common</option>
             <option value="uncommon">Uncommon</option>
@@ -276,15 +346,14 @@
           </select>
         </label>
 
-        <label class="col2">
-          Set Icon (optional)
+        <label class="form-row row-2">
+          <span class="lab">Set Icon</span>
           <input id="setIcon" type="file" accept="image/*" />
         </label>
       </div>
     </section>
   </main>
 
-  <!-- app loads html-to-image/dom-to-image-more from local files -->
   <script src="app.js"></script>
 </body>
 </html>
