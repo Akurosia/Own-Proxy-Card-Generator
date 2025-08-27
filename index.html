@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <title>Stream Saga – Card Front Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Stream Saga card front generator — vibe coded." />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;800&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet" />
@@ -12,11 +11,11 @@
 <body>
   <main class="wrap">
 
-    <!-- Controls -->
-    <section class="panel">
-      <h1>Stream Saga — Card Front</h1>
-      <div class="grid">
+    <!-- LEFT PANEL — BASICS -->
+    <section class="panel panel-left">
+      <h1>Basics</h1>
 
+      <div class="grid">
         <label>
           Name
           <input id="name" type="text" placeholder="e.g. Neon Duck" />
@@ -52,6 +51,15 @@
           </select>
         </label>
 
+        <!-- Layout -->
+        <label>
+          Layout
+          <select id="layoutMode">
+            <option value="standard">Standard</option>
+            <option value="full">Full Art</option>
+          </select>
+        </label>
+
         <label class="col2">
           Previous Stage Image
           <input id="prevImg" type="file" accept="image/*" />
@@ -62,40 +70,33 @@
           <input id="mainImg" type="file" accept="image/*" />
         </label>
 
-        <!-- ABILITY -->
-        <label class="col2">
-          Ability Name
-          <input id="abilityName" type="text" placeholder="e.g. Neon Shield" />
-        </label>
+        <fieldset class="col2 socials">
+          <legend>Socials</legend>
+          <label>
+            <span>YouTube</span>
+            <input id="youtube" type="text" placeholder="YouTube name" />
+          </label>
+          <label>
+            <span>Twitch</span>
+            <input id="twitch" type="text" placeholder="Twitch name" />
+          </label>
+          <label>
+            <span>Instagram</span>
+            <input id="instagram" type="text" placeholder="Instagram name" />
+          </label>
+        </fieldset>
 
-        <label class="col2">
-          Ability Text
-          <textarea id="abilityText" rows="2" placeholder="Describe ability…"></textarea>
-        </label>
-
-        <!-- ATTACK -->
+        <!-- Background colors -->
         <label>
-          Attack Name
-          <input id="attackName" type="text" placeholder="e.g. Circuit Peck" />
+          BG Top Color
+          <input id="bgTop" type="color" value="#0a0d10">
         </label>
-
         <label>
-          Attack Value
-          <input id="attackValue" type="text" placeholder="e.g. 70" />
+          BG Bottom Color
+          <input id="bgBottom" type="color" value="#0b0f12">
         </label>
 
-        <label class="col2">
-          Attack Effect
-          <textarea id="attackEffect" rows="2" placeholder="Describe the attack effect (optional)…"></textarea>
-        </label>
-
-        <!-- FLAVOUR -->
-        <label class="col2">
-          Flavour Text
-          <textarea id="flavour" rows="2" placeholder="Short lore or personality…"></textarea>
-        </label>
-
-        <!-- FOOTER DATA -->
+        <!-- Footer data -->
         <label>
           Card Number (X/Y)
           <input id="numXY" type="text" placeholder="e.g. 12/99" />
@@ -120,114 +121,166 @@
           Set Icon (optional)
           <input id="setIcon" type="file" accept="image/*" />
         </label>
-
-        <!-- Background colors -->
-        <label>
-          BG Top Color
-          <input id="bgTop" type="color" value="#0a0d10">
-        </label>
-        <label>
-          BG Bottom Color
-          <input id="bgBottom" type="color" value="#0b0f12">
-        </label>
-
-        <fieldset class="col2 socials">
-          <legend>Socials</legend>
-          <label><span class="ico yt" aria-hidden="true"></span>
-            <input id="youtube" type="text" placeholder="YouTube name" />
-          </label>
-          <label><span class="ico tw" aria-hidden="true"></span>
-            <input id="twitch" type="text" placeholder="Twitch name" />
-          </label>
-          <label><span class="ico ig" aria-hidden="true"></span>
-            <input id="instagram" type="text" placeholder="Instagram name" />
-          </label>
-        </fieldset>
-      </div>
-
-      <div class="buttons">
-        <button id="resetBtn" type="button">Reset</button>
-        <button id="downloadBtn" type="button">Download PNG</button>
       </div>
     </section>
 
-    <!-- Card Preview -->
+    <!-- CANVAS (center column) -->
     <section class="canvasZone">
-      <div class="card" id="card">
-        <div class="card-inner" aria-hidden="true"></div>
+      <!-- Display-only scaler to fit 1080p screens -->
+      <div class="card-viewport">
+        <div class="card" id="card">
+          <div class="card-inner" aria-hidden="true"></div>
 
-        <div class="frame">
-          <div class="frame-corner tl"></div>
-          <div class="frame-corner tr"></div>
-          <div class="frame-corner bl"></div>
-          <div class="frame-corner br"></div>
+          <div class="frame">
+            <div class="frame-corner tl"></div>
+            <div class="frame-corner tr"></div>
+            <div class="frame-corner bl"></div>
+            <div class="frame-corner br"></div>
+          </div>
+
+          <header class="card-head">
+            <div id="elementBadge" class="badge element calm">CALM</div>
+            <div class="title">
+              <span id="titleName">Neon Duck</span>
+              <span id="titleMod"></span>
+            </div>
+            <div class="stage">
+              <span id="stageText">Base</span>
+              <img id="prevThumb" alt="">
+            </div>
+          </header>
+
+          <div class="card-art">
+            <img id="artImg" alt="">
+          </div>
+
+          <!-- NEW: spacer keeps layout positions in Full Art -->
+          <div class="art-spacer" aria-hidden="true"></div>
+
+          <!-- Social bar (static assets icons) -->
+          <div class="card-socials">
+            <div class="socialItem" data-kind="youtube">
+              <img class="icon" src="assets/youtube.svg" alt="YouTube">
+              <span id="ytName"></span>
+            </div>
+            <div class="socialItem" data-kind="twitch">
+              <img class="icon" src="assets/twitch.svg" alt="Twitch">
+              <span id="twName"></span>
+            </div>
+            <div class="socialItem" data-kind="instagram">
+              <img class="icon" src="assets/instagram.svg" alt="Instagram">
+              <span id="igName"></span>
+            </div>
+          </div>
+
+          <!-- Ability -->
+          <section class="card-ability">
+            <div class="aa-head aa-ability">
+              <span class="ability-flag">ABILITY</span>
+              <span id="abilityTitle" class="aa-title"></span>
+            </div>
+            <p id="abilityDesc"></p>
+          </section>
+
+          <!-- Attack #1 -->
+          <section class="card-attack attack1">
+            <div class="aa-head">
+              <span id="attackTitle" class="aa-title"></span>
+              <span class="value" id="attackVal"></span>
+            </div>
+            <p id="attackEffectText"></p>
+          </section>
+
+          <!-- Attack #2 -->
+          <section class="card-attack attack2">
+            <div class="aa-head">
+              <span id="attack2Title" class="aa-title"></span>
+              <span class="value" id="attack2Val"></span>
+            </div>
+            <p id="attack2EffectText"></p>
+          </section>
+
+          <!-- Flavour aligned to bottom, just above card-credit -->
+          <p class="card-flavour" id="flavourText"></p>
+
+          <!-- Bottom credit bar -->
+          <div class="card-credit">
+            <div class="credit-left">
+              <img id="setIconImg" alt="">
+              <span id="setNameText"></span>
+            </div>
+            <div class="credit-center">Created by <strong>Akurosia Kamo</strong> &amp; <strong>Evidiya</strong></div>
+            <div class="credit-right">
+              <span id="numOut"></span>
+              <span class="rarity"><svg id="rarityIcon" viewBox="0 0 24 24"></svg></span>
+            </div>
+          </div>
         </div>
-
-        <header class="card-head">
-          <div id="elementBadge" class="badge element calm">CALM</div>
-          <div class="title">
-            <span id="titleName">Neon Duck</span>
-            <span id="titleMod"></span>
-          </div>
-          <div class="stage">
-            <span id="stageText">Base</span>
-            <img id="prevThumb" alt="">
-          </div>
-        </header>
-
-        <div class="card-art">
-          <img id="artImg" alt="">
-        </div>
-
-        <div class="card-socials">
-          <div class="socialItem">
-            <svg viewBox="0 0 24 24" class="s-yt" aria-hidden="true"><path d="M23.5 7.2s-.2-1.7-.9-2.4c-.9-.9-1.9-.9-2.3-1C16.6 3.3 12 3.3 12 3.3s-4.6 0-8.3.5c-.4.1-1.4.1-2.3 1-.7.7-.9 2.4-.9 2.4S0 9.2 0 11.2v1.6c0 2 .2 4 .2 4s.2 1.7.9 2.4c.9.9 2 .9 2.5 1 1.8.2 7.5.5 8.4.5s8.3-.1 8.3-.1.9-.1 1.8-1c.7-.7.9-2.4.9-2.4s.2-2 .2-4v-1.6c0-2-.2-4-.2-4zM9.5 14.9V8.7l6.2 3.1-6.2 3.1z"/></svg>
-            <span id="ytName"></span>
-          </div>
-          <div class="socialItem">
-            <svg viewBox="0 0 24 24" class="s-tw" aria-hidden="true"><path d="M4 3h16a1 1 0 011 1v16a1 1 0 01-1 1H13.2l3.6-4.6h3.2l-5.4-6.2 5-6.2h-3l-3.8 4.6L9 3H4zM6.5 6.2l4.7 5.6L7 17.4H5.2l4.5-5.6-4-4.6h.8z"/></svg>
-            <span id="twName"></span>
-          </div>
-          <div class="socialItem">
-            <svg viewBox="0 0 24 24" class="s-ig" aria-hidden="true"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5C7.6 2 6.9 2 5.4 2.1 4 2.2 3 2.5 2.2 3.3 1.4 4.1 1.1 5.1 1 6.6 1 8.1 1 8.8 1 12s0 3.9.1 5.4c.1 1.5.4 2.5 1.2 3.3.8.8 1.8 1.1 3.3 1.2C8.1 22 8.8 22 12 22s3.9 0 5.4-.1c1.5-.1 2.5-.4 3.3-1.2.8-.8 1.1-1.8 1.2-3.3.1-1.5.1-2.2.1-5.4s0-3.9-.1-5.4c-.1-1.5-.4-2.5-1.2-3.3-.8-.8-1.8-1.1-3.3-1.2C15.9 2 15.2 2 12 2zM18 6a1 1 0 110 2 1 1 0 010-2z"/></svg>
-            <span id="igName"></span>
-          </div>
-        </div>
-
-        <section class="card-ability">
-          <div class="aa-head aa-ability">
-            <span class="ability-flag">ABILITY</span>
-            <span id="abilityTitle" class="aa-title"></span>
-          </div>
-          <p id="abilityDesc"></p>
-        </section>
-
-        <section class="card-attack">
-          <div class="aa-head"><span id="attackTitle" class="aa-title"></span><span class="value" id="attackVal"></span></div>
-          <p id="attackEffectText"></p>
-        </section>
-
-        <!-- Flavour aligned to bottom, just above card-credit -->
-        <p class="card-flavour" id="flavourText"></p>
-
-        <!-- Bottom credit bar now also hosts set left, number+rarity right -->
-        <div class="card-credit">
-          <div class="credit-left">
-            <img id="setIconImg" alt=""><span id="setNameText"></span>
-          </div>
-          <div class="credit-center">Created by <strong>Akurosia Kamo</strong> &amp; <strong>Evidiya</strong></div>
-          <div class="credit-right">
-            <span id="numOut"></span>
-            <span class="rarity"><svg id="rarityIcon" viewBox="0 0 24 24"></svg></span>
-          </div>
-        </div>
-
       </div>
+
+      <div class="buttons buttons-center">
+        <button id="resetBtn" type="button">Reset</button>
+        <button id="prefillNormalBtn" type="button">Prefill Normal</button>
+        <button id="prefillFullBtn" type="button">Prefill Full Art</button>
+        <button id="downloadBtn" type="button">Download PNG</button>
+      </div>
+
       <div class="exportNote">What you see is what gets exported.</div>
+    </section>
+
+    <!-- RIGHT PANEL — DETAILS -->
+    <section class="panel panel-right">
+      <h1>Details</h1>
+
+      <div class="grid">
+        <!-- ABILITY -->
+        <label class="col2">
+          Ability Name
+          <input id="abilityName" type="text" placeholder="e.g. Overclock Aura" />
+        </label>
+        <label class="col2">
+          Ability Text
+          <textarea id="abilityText" rows="2" placeholder="Describe ability…"></textarea>
+        </label>
+
+        <!-- ATTACK 1 -->
+        <label>
+          Attack #1 Name
+          <input id="attackName" type="text" placeholder="e.g. Circuit Peck" />
+        </label>
+        <label>
+          Attack #1 Value
+          <input id="attackValue" type="text" placeholder="e.g. 70" />
+        </label>
+        <label class="col2">
+          Attack #1 Effect
+          <textarea id="attackEffect" rows="2" placeholder="Optional effect…"></textarea>
+        </label>
+
+        <!-- ATTACK 2 -->
+        <label>
+          Attack #2 Name
+          <input id="attack2Name" type="text" placeholder="e.g. Neon Burst" />
+        </label>
+        <label>
+          Attack #2 Value
+          <input id="attack2Value" type="text" placeholder="e.g. 90" />
+        </label>
+        <label class="col2">
+          Attack #2 Effect
+          <textarea id="attack2Effect" rows="2" placeholder="Optional effect…"></textarea>
+        </label>
+
+        <!-- FLAVOUR -->
+        <label class="col2">
+          Flavour Text
+          <textarea id="flavour" rows="2" placeholder="Short lore or personality…"></textarea>
+        </label>
+      </div>
     </section>
   </main>
 
-  <!-- app.js dynamically loads html-to-image / dom-to-image-more when needed -->
+  <!-- app loads html-to-image/dom-to-image-more from local files -->
   <script src="app.js"></script>
 </body>
 </html>

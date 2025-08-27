@@ -1,7 +1,4 @@
-/* Stream Saga – Card Front Generator (Repo)
-   New export approach using html-to-image with dom-to-image-more fallback.
-   This project is vibe coded.
-*/
+/* Stream Saga — Full Art keeps positions (spacer), 2 demos, local export libs */
 
 const el = id => document.getElementById(id);
 
@@ -10,9 +7,11 @@ const state = {
   nameMod: "",
   element: "calm",
   stage: "base",
+  layout: "standard",
   youtube: "", twitch: "", instagram: "",
-  attackName: "", attackValue: "", attackEffect:"",
   abilityName: "", abilityText: "",
+  attackName: "", attackValue: "", attackEffect: "",
+  attack2Name: "", attack2Value: "", attack2Effect: "",
   flavour: "",
   numXY: "",
   setName: "",
@@ -20,76 +19,52 @@ const state = {
   artURL: "", prevURL: "", setIconURL: ""
 };
 
-/* --- Helpers to load libraries on demand --- */
-function loadScript(src){
-  return new Promise((resolve, reject)=>{
-    if (document.querySelector('script[src="'+src+'"]')) return resolve();
-    const s=document.createElement('script');
-    s.src=src; s.async=true; s.onload=resolve; s.onerror=()=>reject(new Error('Failed to load '+src));
-    document.head.appendChild(s);
-  });
-}
-async function ensureExportLibs(){
-  if(!window.htmlToImage){
-    try {
-        await loadScript('html-to-image.js');
-    } catch{}
-}
-  if(!window.domtoimage){
-    try {
-        await loadScript('dom-to-image-more.js');
-    } catch{}
-  }
-}
-
-
-/* --- Bind inputs and draw functions --- */
 function bindInputs(){
   const map = [
     ["name","input", v => { state.name=v; drawText(); }],
     ["nameMod","change", v => { state.nameMod=v; drawText(); }],
     ["element","change", v => { state.element=v; drawElement(); }],
     ["stage","change", v => { state.stage=v; drawStage(); }],
-    ["abilityName","input", v => { state.abilityName=v; drawAbility(); }],
-    ["abilityText","input", v => { state.abilityText=v; drawAbility(); }],
-    ["attackName","input", v => { state.attackName=v; drawAttack(); }],
-    ["attackValue","input", v => { state.attackValue=v; drawAttack(); }],
-    ["attackEffect","input", v => { state.attackEffect=v; drawAttack(); }],
-    ["flavour","input", v => { state.flavour=v; drawFlavour(); }],
+    ["layoutMode","change", v => { setLayout(v); }],
     ["numXY","input", v => { state.numXY=v; drawCredit(); }],
     ["setName","input", v => { state.setName=v; drawCredit(); }],
     ["rarity","change", v => { state.rarity=v; drawCredit(); }],
     ["youtube","input", v => { state.youtube=v; drawSocials(); }],
     ["twitch","input", v => { state.twitch=v; drawSocials(); }],
     ["instagram","input", v => { state.instagram=v; drawSocials(); }],
+
+    ["abilityName","input", v => { state.abilityName=v; drawAbility(); }],
+    ["abilityText","input", v => { state.abilityText=v; drawAbility(); }],
+
+    ["attackName","input", v => { state.attackName=v; drawAttack1(); }],
+    ["attackValue","input", v => { state.attackValue=v; drawAttack1(); }],
+    ["attackEffect","input", v => { state.attackEffect=v; drawAttack1(); }],
+
+    ["attack2Name","input", v => { state.attack2Name=v; drawAttack2(); }],
+    ["attack2Value","input", v => { state.attack2Value=v; drawAttack2(); }],
+    ["attack2Effect","input", v => { state.attack2Effect=v; drawAttack2(); }],
+
+    ["flavour","input", v => { state.flavour=v; drawFlavour(); }],
   ];
   map.forEach(([id,ev,fn])=>{
-    const n = document.getElementById(id);
+    const n=el(id);
     if(n) n.addEventListener(ev, e=>fn(e.target.value));
   });
 
   // files
-  const files = [
-    ["mainImg", url=>{ state.artURL=url; drawArt(); }],
-    ["prevImg", url=>{ state.prevURL=url; drawStage(); }],
-    ["setIcon", url=>{ state.setIconURL=url; drawCredit(); }]
-  ];
-  files.forEach(([id,cb])=>{
-    const n=document.getElementById(id);
-    if(!n) return;
-    n.addEventListener("change", e => loadFile(e.target.files[0], cb));
-  });
+  el("mainImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.artURL=url; drawArt(); }));
+  el("prevImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.prevURL=url; drawStage(); }));
+  el("setIcon").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.setIconURL=url; drawCredit(); }));
 
   // background colors
-  const bgTop = document.getElementById("bgTop");
-  const bgBottom = document.getElementById("bgBottom");
-  if(bgTop) bgTop.addEventListener("input", e=>{ document.getElementById("card").style.setProperty("--bg-top", e.target.value); });
-  if(bgBottom) bgBottom.addEventListener("input", e=>{ document.getElementById("card").style.setProperty("--bg-bottom", e.target.value); });
+  el("bgTop").addEventListener("input", e=>{ el("card").style.setProperty("--bg-top", e.target.value); });
+  el("bgBottom").addEventListener("input", e=>{ el("card").style.setProperty("--bg-bottom", e.target.value); });
 
-  const dl=document.getElementById("downloadBtn");
-  if(dl) dl.addEventListener("click", downloadPNG);
-  const reset=document.getElementById("resetBtn");
-  if(reset) reset.addEventListener("click", resetForm);
+  // buttons
+  el("resetBtn").addEventListener("click", resetForm);
+  el("prefillNormalBtn").addEventListener("click", prefillNormal);
+  el("prefillFullBtn").addEventListener("click", prefillFullArt);
+  el("downloadBtn").addEventListener("click", downloadPNG);
 }
 
 function loadFile(file, cb){
@@ -99,158 +74,203 @@ function loadFile(file, cb){
   r.readAsDataURL(file);
 }
 
-function drawText(){
-  const tn=el("titleName"); if(tn) tn.textContent = state.name || " ";
-  const tm=el("titleMod"); if(tm) tm.textContent = state.nameMod || "";
+/* Layout toggle */
+function setLayout(mode){
+  state.layout = mode === "full" ? "full" : "standard";
+  const card = el("card");
+  card.classList.toggle("fullart", state.layout === "full");
+  const sel = el("layoutMode");
+  if (sel && sel.value !== state.layout) sel.value = state.layout;
 }
-function drawElement(){
-  const b = el("elementBadge");
-  if(!b) return;
-  b.textContent = (state.element||"").toUpperCase();
-  b.className = "badge element " + state.element;
-}
+
+/* Drawers */
+function drawText(){ el("titleName").textContent = state.name || " "; el("titleMod").textContent = state.nameMod || ""; }
+function drawElement(){ const b=el("elementBadge"); b.textContent=(state.element||"").toUpperCase(); b.className="badge element "+state.element; }
 function drawStage(){
-  const st=el("stageText"); if(st) st.textContent = state.stage==="base"?"Base":(state.stage==="step1"?"Step 1":"Step 2");
-  const thumb=el("prevThumb");
-  if(!thumb) return;
-  if(state.stage!=="base" && state.prevURL){ thumb.src=state.prevURL; thumb.style.display="block"; }
-  else{ thumb.removeAttribute("src"); thumb.style.display="none"; }
+  el("stageText").textContent = state.stage==="base"?"Base":(state.stage==="step1"?"Step 1":"Step 2");
+  const t=el("prevThumb");
+  if(state.stage!=="base" && state.prevURL){ t.src=state.prevURL; t.style.display="block"; } else { t.removeAttribute("src"); t.style.display="none"; }
 }
-function drawArt(){
-  const img=el("artImg");
-  if(!img) return;
-  if(state.artURL){ img.src=state.artURL; img.style.display="block"; }
-  else{ img.removeAttribute("src"); img.style.display="none"; }
-}
+function drawArt(){ const img=el("artImg"); if(state.artURL){ img.src=state.artURL; img.style.display="block"; } else { img.removeAttribute("src"); img.style.display="none"; } }
 function drawSocials(){
   const pairs=[["ytName",state.youtube],["twName",state.twitch],["igName",state.instagram]];
   let any=false;
   pairs.forEach(([id,val])=>{
-    const n=el(id); if(!n) return;
-    n.textContent=val;
-    const visible = !!(val && val.trim());
-    const parent = n.parentElement;
-    if(parent) parent.style.display=visible?"flex":"none";
-    if(visible) any=true;
+    const n=el(id); n.textContent=val||"";
+    const show=!!(val && val.trim()); n.parentElement.style.display=show?"flex":"none"; if(show) any=true;
   });
-  const container = document.querySelector(".card-socials");
-  if(container) container.style.display = any ? "flex" : "none";
-}
-function drawAttack(){
-  const box=document.querySelector(".card-attack");
-  if(!box) return;
-  const has = (state.attackName && state.attackName.trim()) || (state.attackEffect && state.attackEffect.trim());
-  if(has){
-    const t=el("attackTitle"); if(t) t.textContent=state.attackName||"";
-    const v=el("attackVal"); if(v) v.textContent=state.attackValue||"";
-    const e=el("attackEffectText"); if(e) e.textContent=state.attackEffect||"";
-    box.style.display="block";
-  } else {
-    box.style.display="none";
-  }
+  document.querySelector(".card-socials").style.display = any ? "flex" : "none";
 }
 function drawAbility(){
   const box=document.querySelector(".card-ability");
-  if(!box) return;
   if(state.abilityName && state.abilityName.trim()){
-    const t=el("abilityTitle"); if(t) t.textContent=state.abilityName;
-    const d=el("abilityDesc"); if(d) d.textContent=state.abilityText||"";
+    el("abilityTitle").textContent=state.abilityName;
+    el("abilityDesc").textContent=state.abilityText||"";
     box.style.display="block";
-  } else {
-    box.style.display="none";
-  }
+  } else { box.style.display="none"; }
 }
-function drawFlavour(){ const f=el("flavourText"); if(f) f.textContent=state.flavour||""; }
+function drawAttack1(){
+  const box=document.querySelector(".card-attack.attack1");
+  const has = (state.attackName && state.attackName.trim()) || (state.attackEffect && state.attackEffect.trim());
+  if(has){
+    el("attackTitle").textContent=state.attackName||"";
+    el("attackVal").textContent=state.attackValue||"";
+    el("attackEffectText").textContent=state.attackEffect||"";
+    box.style.display="block";
+  } else { box.style.display="none"; }
+}
+function drawAttack2(){
+  const box=document.querySelector(".card-attack.attack2");
+  const has = (state.attack2Name && state.attack2Name.trim()) || (state.attack2Effect && state.attack2Effect.trim());
+  if(has){
+    el("attack2Title").textContent=state.attack2Name||"";
+    el("attack2Val").textContent=state.attack2Value||"";
+    el("attack2EffectText").textContent=state.attack2Effect||"";
+    box.style.display="block";
+  } else { box.style.display="none"; }
+}
+function drawFlavour(){ el("flavourText").textContent=state.flavour || ""; }
 function drawCredit(){
-  const setN=el("setNameText"); if(setN) setN.textContent=state.setName||"";
-  const num=el("numOut"); if(num) num.textContent=state.numXY||"";
-
-  const icon=document.getElementById("setIconImg");
-  if(icon){
-    if(state.setIconURL){ icon.src=state.setIconURL; icon.style.display="inline-block"; }
-    else { icon.removeAttribute("src"); icon.style.display="none"; }
-  }
-
-  const rarityBox=document.querySelector(".card-credit .rarity");
-  if(rarityBox) rarityBox.className="rarity "+(state.rarity||"common");
-  const svg=document.getElementById("rarityIcon");
-  if(svg) svg.innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
+  el("setNameText").textContent=state.setName||""; el("numOut").textContent=state.numXY||"";
+  const icon=el("setIconImg");
+  if(state.setIconURL){ icon.src=state.setIconURL; icon.style.display="inline-block"; } else { icon.removeAttribute("src"); icon.style.display="none"; }
+  const rb=document.querySelector(".card-credit .rarity");
+  rb.className="rarity "+(state.rarity||"common");
+  el("rarityIcon").innerHTML='<path d="M12 .9l3 6.1 6.7 1-4.9 4.8 1.2 6.7L12 16.9 6 19.5l1.2-6.7L2.3 8l6.7-1L12 .9z"/>';
 }
 
-/* --- New export approach: html-to-image with fallback --- */
+/* Demo: Normal */
+function makeDataImage(w,h,draw){ const c=document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d'); draw(ctx,w,h); return c.toDataURL('image/png'); }
+function prefillNormal(){
+  const set=(id,val)=>{ const n=el(id); if(n) n.value=val; };
+
+  setLayout("standard");
+  state.name="Neon Duck"; state.nameMod="EX"; state.element="chaotic"; state.stage="step1";
+  state.youtube="NeonDuckYT"; state.twitch="NeonDuckLive"; state.instagram="neon.duck";
+  state.numXY="12/99"; state.setName="Night Circuit"; state.rarity="rare";
+
+  state.abilityName="Overclock Aura"; state.abilityText="Once per turn, your next attack deals +20 if you changed a setting.";
+  state.attackName="Circuit Peck"; state.attackValue="70"; state.attackEffect="Flip a coin. If heads, the target is stunned next turn.";
+  state.attack2Name="Neon Burst"; state.attack2Value="90"; state.attack2Effect="Discard 1 card at random from your hand.";
+  state.flavour="Raised on city neon and late-night streams, this duck quacks in binary and dreams in blue-and-red.";
+
+  set("layoutMode","standard");
+  set("name",state.name); set("nameMod",state.nameMod); set("element",state.element); set("stage",state.stage);
+  set("youtube",state.youtube); set("twitch",state.twitch); set("instagram",state.instagram);
+  set("numXY",state.numXY); set("setName",state.setName); set("rarity",state.rarity);
+  set("abilityName",state.abilityName); set("abilityText",state.abilityText);
+  set("attackName",state.attackName); set("attackValue",state.attackValue); set("attackEffect",state.attackEffect);
+  set("attack2Name",state.attack2Name); set("attack2Value",state.attack2Value); set("attack2Effect",state.attack2Effect);
+  set("flavour",state.flavour);
+
+  state.artURL = makeDataImage(1200,800,(ctx,w,h)=>{ const g=ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'#0a0d10'); g.addColorStop(1,'#243f66'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalAlpha=.25; ctx.strokeStyle='#39b8ff'; ctx.lineWidth=40; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w,h); ctx.moveTo(w,0); ctx.lineTo(0,h); ctx.stroke(); ctx.globalAlpha=1; });
+  state.setIconURL = makeDataImage(128,128,(ctx,w,h)=>{ ctx.fillStyle='#12171c'; ctx.fillRect(0,0,w,h); ctx.strokeStyle='#39b8ff'; ctx.lineWidth=10; ctx.strokeRect(14,14,w-28,h-28); ctx.strokeStyle='#ff3b3b'; ctx.beginPath(); ctx.moveTo(28,28); ctx.lineTo(w-28,h-28); ctx.moveTo(w-28,28); ctx.lineTo(28,h-28); ctx.stroke(); });
+  state.prevURL = makeDataImage(256,256,(ctx,w,h)=>{ const g=ctx.createLinearGradient(0,0,w,0); g.addColorStop(0,'#111b24'); g.addColorStop(1,'#2a1a1a'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h); });
+
+  drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
+}
+
+/* Demo: Full Art (positions preserved by spacer) */
+function prefillFullArt(){
+  const set=(id,val)=>{ const n=el(id); if(n) n.value=val; };
+
+  setLayout("full");
+  state.name="Skyline Duck"; state.nameMod="MAX"; state.element="friendly"; state.stage="base";
+  state.youtube="SkylineStreams"; state.twitch="SkylineDuck"; state.instagram="sky.duck";
+  state.numXY="01/45"; state.setName="City Lights"; state.rarity="ultra";
+
+  state.abilityName="City Sync"; state.abilityText="While this card is Active, your attacks cost 1 less energy if you streamed this turn.";
+  state.attackName="Billboard Bash"; state.attackValue="110"; state.attackEffect="If you have more followers than your opponent, draw a card.";
+  state.attack2Name="Overtime Glow"; state.attack2Value="60"; state.attack2Effect="Heal 20 damage from one of your benched allies.";
+  state.flavour="Lit by the skyline, boosted by chat—this duck never logs off.";
+
+  set("layoutMode","full");
+  set("name",state.name); set("nameMod",state.nameMod); set("element",state.element); set("stage",state.stage);
+  set("youtube",state.youtube); set("twitch",state.twitch); set("instagram",state.instagram);
+  set("numXY",state.numXY); set("setName",state.setName); set("rarity",state.rarity);
+  set("abilityName",state.abilityName); set("abilityText",state.abilityText);
+  set("attackName",state.attackName); set("attackValue",state.attackValue); set("attackEffect",state.attackEffect);
+  set("attack2Name",state.attack2Name); set("attack2Value",state.attack2Value); set("attack2Effect",state.attack2Effect);
+  set("flavour",state.flavour);
+
+  // full art background
+  state.artURL = makeDataImage(1400,1000,(ctx,w,h)=>{
+    const g=ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,'#0a0d10'); g.addColorStop(.45,'#123a64'); g.addColorStop(1,'#3b0f18');
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    ctx.globalAlpha=.2; ctx.fillStyle='#39b8ff'; for(let i=0;i<50;i++){ ctx.fillRect(Math.random()*w, Math.random()*h, 2, Math.random()*40+10); }
+    ctx.globalAlpha=.12; ctx.fillStyle='#ff3b3b'; for(let i=0;i<40;i++){ ctx.fillRect(Math.random()*w, Math.random()*h, 2, Math.random()*30+10); }
+    ctx.globalAlpha=1;
+  });
+  state.setIconURL = makeDataImage(128,128,(ctx,w,h)=>{ ctx.fillStyle='#0e1419'; ctx.fillRect(0,0,w,h); ctx.strokeStyle='#8cd6ff'; ctx.lineWidth=8; ctx.beginPath(); ctx.arc(w/2,h/2,40,0,Math.PI*2); ctx.stroke(); ctx.strokeStyle='#ff6b6b'; ctx.beginPath(); ctx.moveTo(20,20); ctx.lineTo(w-20,h-20); ctx.moveTo(w-20,20); ctx.lineTo(20,h-20); ctx.stroke(); });
+  state.prevURL = ""; // base layout
+
+  drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
+}
+
+/* Export libs — load from local files as requested */
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    if(document.querySelector('script[src="'+src+'"]')) return res();
+    const s=document.createElement('script'); s.src=src; s.async=true;
+    s.onload=res; s.onerror=()=>rej(new Error('Failed to load '+src));
+    document.head.appendChild(s);
+  });
+}
+async function ensureExportLibs(){
+  if(!window.htmlToImage) await loadScript('html-to-image.js');
+  if(!window.domtoimage) await loadScript('dom-to-image-more.js');
+}
+
+/* Export */
 async function downloadPNG(){
   const card = el("card");
   if(!card) return;
 
   await ensureExportLibs();
+  if(document.fonts && document.fonts.ready) await document.fonts.ready;
 
-  if (document.fonts && document.fonts.ready) {
-    await document.fonts.ready;
-  }
-  const imgs = [el("artImg"), el("prevThumb"), el("setIconImg")].filter(Boolean);
-  await Promise.all(imgs.map(img => {
-    if (img.src && !img.complete) {
-      return new Promise(res=>img.addEventListener("load", res, {once:true}));
-    }
-  }));
+  // wait for images (art, prev thumb, set icon, social icons)
+  const imgs=[el("artImg"), el("prevThumb"), el("setIconImg"), ...document.querySelectorAll(".card-socials .icon")].filter(Boolean);
+  await Promise.all(imgs.map(i=> i && i.src && !i.complete ? new Promise(r=>i.addEventListener("load",r,{once:true})) : Promise.resolve()));
 
-  // inline CSS vars / gradient in case the library loses them
-  const cs = getComputedStyle(card);
-  const top = (cs.getPropertyValue("--bg-top") || "#0a0d10").trim();
-  const bottom = (cs.getPropertyValue("--bg-bottom") || "#0b0f12").trim();
-  card.style.setProperty("--bg-top", top);
-  card.style.setProperty("--bg-bottom", bottom);
-  card.style.backgroundImage = `linear-gradient(180deg, ${top}, ${bottom})`;
+  // inline gradient vars so clone matches
+  const cs=getComputedStyle(card); const top=(cs.getPropertyValue('--bg-top')||'#0a0d10').trim(); const bottom=(cs.getPropertyValue('--bg-bottom')||'#0b0f12').trim();
+  card.style.setProperty('--bg-top', top); card.style.setProperty('--bg-bottom', bottom); card.style.backgroundImage=`linear-gradient(180deg, ${top}, ${bottom})`;
 
-  const filename = (state.name || "card") + ".png";
+  const filename=(state.name||'card')+'.png';
+
+  // temporarily disable display scale so export is full-res
+  const viewportCard = document.querySelector(".card-viewport > .card") || card;
+  const prevTransform = viewportCard.style.transform;
+  viewportCard.style.transform = "none";
 
   try{
-    const dataUrl = await window.htmlToImage.toPng(card, {
-      pixelRatio: 2,
-      backgroundColor: null,
-      cacheBust: true
-    });
+    const dataUrl = await window.htmlToImage.toPng(card,{pixelRatio:2,backgroundColor:null,cacheBust:true});
     triggerDownload(dataUrl, filename);
-  } catch(err){
-    console.warn("html-to-image failed, falling back:", err);
+  }catch(e1){
     try{
-      const dataUrl2 = await window.domtoimage.toPng(card, {
-        quality: 1,
-        bgcolor: "transparent",
-        height: card.offsetHeight,
-        width: card.offsetWidth,
-        style: {
-          "--bg-top": top,
-          "--bg-bottom": bottom,
-          "backgroundImage": `linear-gradient(180deg, ${top}, ${bottom})`
-        }
-      });
+      const dataUrl2 = await window.domtoimage.toPng(card,{quality:1,bgcolor:'transparent',height:card.offsetHeight,width:card.offsetWidth,style:{'--bg-top':top,'--bg-bottom':bottom,'backgroundImage':`linear-gradient(180deg, ${top}, ${bottom})`}});
       triggerDownload(dataUrl2, filename);
-    }catch(err2){
-      console.error("Fallback export failed:", err2);
-      alert("Export failed. Try adding an image, then click Download again.");
+    }catch(e2){
+      alert('Export failed. Make sure html-to-image.js and dom-to-image-more.js are present.');
+      console.error(e1, e2);
     }
   } finally {
-    // don't need to revert inline vars for a static page, but we could
+    viewportCard.style.transform = prevTransform;
   }
 }
+function triggerDownload(dataUrl, filename){ const a=document.createElement('a'); a.download=filename; a.href=dataUrl; document.body.appendChild(a); a.click(); a.remove(); }
 
-function triggerDownload(dataUrl, filename){
-  const link=document.createElement("a");
-  link.download=filename;
-  link.href=dataUrl;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-}
-
-/* reset */
+/* Reset */
 function resetForm(){
   Object.keys(state).forEach(k=>state[k]="");
-  state.element="calm"; state.stage="base"; state.rarity="common";
-  drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAttack(); drawAbility(); drawFlavour(); drawCredit();
+  state.element="calm"; state.stage="base"; state.rarity="common"; state.layout="standard";
+  setLayout("standard");
+  drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
 }
 
-/* init */
+/* Init */
 bindInputs();
-drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAttack(); drawAbility(); drawFlavour(); drawCredit();
+setLayout("standard");
+drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
