@@ -1,4 +1,4 @@
-/* Stream Saga — robust rarity color handling (works on GitHub Pages), grouped fields, export */
+/* Stream Saga — exact-size export via off-screen clone (fixes height), robust rarity color, SVG icons inline, square corners on export */
 
 const el = id => document.getElementById(id);
 
@@ -18,7 +18,7 @@ const state = {
   rarity: "common",
   artURL: "", prevURL: "", setIconURL: "",
   rarityColorOverride: false,
-  rarityColor: "#c9c9c9"   // <— tracked explicitly; no getComputedStyle needed
+  rarityColor: "#c9c9c9"
 };
 
 function bindInputs(){
@@ -50,7 +50,7 @@ function bindInputs(){
     ["setName","input", v => { state.setName=v; drawCredit(); }],
     ["rarity","change", v => {
       state.rarity=v;
-      state.rarityColorOverride=false;           // snap back to default color for this rarity
+      state.rarityColorOverride=false;
       state.rarityColor = currentRarityDefaultColor(state.rarity);
       drawCredit();
       syncRarityColorSwatch();
@@ -74,7 +74,7 @@ function bindInputs(){
   // Per-field text colors (includes socials)
   initTextColorSwatches();
 
-  // RARITY color picker (swatch sits on same row as dropdown)
+  // RARITY color picker
   setupSwatch("c_rarity","c_raritySw", ()=> {
     const val = el("c_rarity").value;
     const svg = el("rarityIcon");
@@ -241,13 +241,13 @@ function drawCredit(){
   const rarityIcon = el("rarityIcon");
   let svg="";
   switch(r){
-    case "common":   svg = '<circle cx="12" cy="12" r="7.5"/>'; break;              // circle
-    case "uncommon": svg = '<path d="M12 3l7 9-7 9-7-9 7-9z"/>'; break;            // diamond
-    case "rare":     svg = '<path d="M12 2.5l3.1 6.3 7 1-5.1 5 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5.1-5 7-1L12 2.5z"/>'; break; // star
-    case "ultra":    svg = '<path d="M3 17h18v2H3v-2zM3 9l4 3 5-6 5 6 4-3v7H3V9z"/>'; break; // crown
-    case "epic":     svg = '<path d="M12 2l7 4v8l-7 4-7-4V6z"/>'; break;          // hexagon-ish
-    case "mythic":   svg = '<path d="M12 3l9 16H3z"/>'; break;                    // triangle
-    case "secret":   svg = '<path d="M12 5c-5 0-9 7-9 7s4 7 9 7 9-7 9-7-4-7-9-7zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>'; break; // eye
+    case "common":   svg = '<circle cx="12" cy="12" r="7.5"/>'; break;
+    case "uncommon": svg = '<path d="M12 3l7 9-7 9-7-9 7-9z"/>'; break;
+    case "rare":     svg = '<path d="M12 2.5l3.1 6.3 7 1-5.1 5 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5.1-5 7-1L12 2.5z"/>'; break;
+    case "ultra":    svg = '<path d="M3 17h18v2H3v-2zM3 9l4 3 5-6 5 6 4-3v7H3V9z"/>'; break;
+    case "epic":     svg = '<path d="M12 2l7 4v8l-7 4-7-4V6z"/>'; break;
+    case "mythic":   svg = '<path d="M12 3l9 16H3z"/>'; break;
+    case "secret":   svg = '<path d="M12 5c-5 0-9 7-9 7s4 7 9 7 9-7 9-7-4-7-9-7zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>'; break;
     default:         svg = '<circle cx="12" cy="12" r="7.5"/>';
   }
   rarityIcon.innerHTML = svg;
@@ -255,12 +255,10 @@ function drawCredit(){
   const defaultFill = currentRarityDefaultColor(r);
   const colorToUse = state.rarityColorOverride ? (state.rarityColor || defaultFill) : defaultFill;
 
-  // Apply via style AND attributes for maximum compatibility
   rarityIcon.style.fill = colorToUse;
   Array.from(rarityIcon.children).forEach(ch => ch.setAttribute('fill', colorToUse));
 }
 
-/* Helper: default color per rarity (no computed style) */
 function currentRarityDefaultColor(r){
   return ({
     common:"#c9c9c9",
@@ -281,25 +279,20 @@ async function inlineSocialSVGIcons(root){
     try{
       const res = await fetch(img.src, {cache:"no-store"});
       const text = await res.text();
-
       const parser = new DOMParser();
       const doc = parser.parseFromString(text, "image/svg+xml");
       const svg = doc.documentElement;
       if(!svg || svg.nodeName.toLowerCase() !== "svg") return;
-
       svg.removeAttribute("width");
       svg.removeAttribute("height");
       svg.setAttribute("preserveAspectRatio","xMidYMid meet");
-
       const cls = (img.getAttribute("class")||"") + " svg-inline";
       svg.setAttribute("class", cls.trim());
       const alt = img.getAttribute("alt") || "";
       if(alt){ svg.setAttribute("role","img"); svg.setAttribute("aria-label", alt); }
-
       svg.style.width = (getComputedStyle(img).width || "18px");
       svg.style.height = (getComputedStyle(img).height || "18px");
       svg.style.display = "block";
-
       img.replaceWith(svg);
     }catch(e){
       console.warn("Inline SVG failed for", img.src, e);
@@ -383,7 +376,7 @@ function prefillFullArt(){
   syncRarityColorSwatch();
 }
 
-/* Export libs (load from your assets root or same folder) */
+/* Export libs */
 function loadScript(src){
   return new Promise((res,rej)=>{
     if(document.querySelector('script[src="'+src+'"]')) return res();
@@ -397,7 +390,12 @@ async function ensureExportLibs(){
   if(!window.domtoimage) await loadScript('dom-to-image-more.js');
 }
 
-/* Export PNG */
+/* ----- Exact-size export using an off-screen clone (square corners) ----- */
+function cssVarPx(name){
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const m = v.match(/([\d.]+)/);
+  return m ? Math.round(parseFloat(m[1])) : 0;
+}
 async function downloadPNG(){
   const card = el("card");
   if(!card) return;
@@ -405,40 +403,74 @@ async function downloadPNG(){
   await ensureExportLibs();
   if(document.fonts && document.fonts.ready) await document.fonts.ready;
 
-  // inline social icons as real <svg> nodes so exporters capture them
-  await inlineSocialSVGIcons(card);
+  // Off-screen clone to avoid transforms/media-query effects
+  const w = cssVarPx("--card-w") || card.offsetWidth;
+  const h = cssVarPx("--card-h") || card.offsetHeight;
 
-  const imgs=[el("artImg"), el("prevThumb"), el("setIconImg")].filter(Boolean);
-  await Promise.all(imgs.map(i=> i && i.src && !i.complete ? new Promise(r=>i.addEventListener("load",r,{once:true})) : Promise.resolve()));
+  const clone = card.cloneNode(true);
 
-  const cs=getComputedStyle(card);
-  const top=(cs.getPropertyValue('--bg-top')||'#0a0d10').trim();
-  const bottom=(cs.getPropertyValue('--bg-bottom')||'#0b0f12').trim();
-  card.style.setProperty('--bg-top', top);
-  card.style.setProperty('--bg-bottom', bottom);
-  card.style.backgroundImage=`linear-gradient(180deg, ${top}, ${bottom})`;
+  // Preserve background variables
+  const cs = getComputedStyle(card);
+  const top = (cs.getPropertyValue('--bg-top')||'#0a0d10').trim();
+  const bottom = (cs.getPropertyValue('--bg-bottom')||'#0b0f12').trim();
 
-  const filename=(state.name||'card')+'.png';
-  const viewportCard = document.querySelector(".card-viewport > .card") || card;
-  const prevTransform = viewportCard.style.transform;
-  viewportCard.style.transform = "none";
+  Object.assign(clone.style, {
+    position: "fixed",
+    left: "-10000px",
+    top: "0",
+    transform: "none",
+    width: w + "px",
+    height: h + "px",
+    backgroundImage: `linear-gradient(180deg, ${top}, ${bottom})`,
+    borderRadius: "0px" // <— SQUARE CORNERS FOR EXPORT
+  });
+  clone.style.setProperty("--bg-top", top);
+  clone.style.setProperty("--bg-bottom", bottom);
+
+  // Ensure icons are inline SVGs inside the clone
+  document.body.appendChild(clone);
+  await inlineSocialSVGIcons(clone);
+
+  // Wait any <img> inside clone
+  const imgs = Array.from(clone.querySelectorAll("img")).filter(i=>i.src && !i.complete);
+  await Promise.all(imgs.map(i=> new Promise(r=> i.addEventListener("load", r, {once:true}))));
+
+  const filename = (state.name || 'card') + '.png';
+  const PIXEL_RATIO = 1; // set to 2 for 1500×2100 output
 
   try{
-    const dataUrl = await window.htmlToImage.toPng(card,{pixelRatio:2,backgroundColor:null,cacheBust:true});
+    const dataUrl = await window.htmlToImage.toPng(clone,{
+      width: w,
+      height: h,
+      pixelRatio: PIXEL_RATIO,
+      backgroundColor: null,
+      cacheBust: true,
+      style: { transform: "none", width: w+"px", height: h+"px", borderRadius: "0px" }
+    });
     triggerDownload(dataUrl, filename);
   }catch(e1){
     try{
-      const dataUrl2 = await window.domtoimage.toPng(card,{quality:1,bgcolor:'transparent',height:card.offsetHeight,width:card.offsetWidth,style:{'--bg-top':top,'--bg-bottom':bottom,'backgroundImage':`linear-gradient(180deg, ${top}, ${bottom})`}});
+      const dataUrl2 = await window.domtoimage.toPng(clone,{
+        quality: 1,
+        bgcolor: 'transparent',
+        width: w,
+        height: h,
+        style: { transform: "none", width: w+"px", height: h+"px", backgroundImage:`linear-gradient(180deg, ${top}, ${bottom})`, borderRadius: "0px" }
+      });
       triggerDownload(dataUrl2, filename);
     }catch(e2){
       alert('Export failed. Ensure html-to-image.js and dom-to-image-more.js are present.');
       console.error(e1, e2);
     }
   } finally {
-    viewportCard.style.transform = prevTransform;
+    clone.remove();
   }
 }
-function triggerDownload(dataUrl, filename){ const a=document.createElement('a'); a.download=filename; a.href=dataUrl; document.body.appendChild(a); a.click(); a.remove(); }
+
+function triggerDownload(dataUrl, filename){
+  const a=document.createElement('a');
+  a.download=filename; a.href=dataUrl; document.body.appendChild(a); a.click(); a.remove();
+}
 
 /* Reset */
 function resetForm(){
