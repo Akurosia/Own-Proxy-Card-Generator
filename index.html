@@ -1,199 +1,195 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Stream Saga – Card Front Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;800&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
-  <link href="styles.css" rel="stylesheet" />
+  <meta charset="utf-8"/>
+  <title>Stream Saga — Card Maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="styles.css" rel="stylesheet"/>
 </head>
 <body>
-  <main class="wrap">
-
-    <!-- LEFT PANEL — BASICS -->
-    <section class="panel panel-left">
+  <div class="wrap">
+    <!-- LEFT PANEL — Basics -->
+    <aside class="panel panel-left">
       <h1>Basics</h1>
-
       <div class="grid">
-        <!-- Name (LABEL : FIELD : COLOR) — icon removed -->
-        <label class="form-row row-3">
-          <span class="lab">Name</span>
-          <input id="name" type="text" placeholder="e.g. Neon Duck" />
-          <div class="color-cell">
-            <input id="c_name" type="color" class="hidden-color">
-            <button id="c_nameSw" type="button" class="swatch-btn"><span class="swatch"></span></button>
-          </div>
-        </label>
 
-        <!-- Name Modifier -->
-        <label class="form-row row-2">
-          <span class="lab">Name Modifier</span>
-          <select id="nameMod">
-            <option value="">(none)</option>
-            <option value="EX">EX</option>
-            <option value="MAX">MAX</option>
-            <option value="V">V</option>
-            <option value="VSTAR">VSTAR</option>
-          </select>
-        </label>
+        <!-- Name -->
+        <div class="form-row row-3">
+          <div class="lab">Name</div>
+          <input id="name" type="text" placeholder="Card name"/>
+          <button id="c_nameSw" class="swatch-btn" type="button" title="Name color">
+            <span class="swatch"></span>
+          </button>
+          <input id="c_name" class="hidden-color" type="color" value="#cfe8ff"/>
+        </div>
 
-        <!-- Element -->
-        <label class="form-row row-2">
-          <span class="lab">Element</span>
+        <!-- Name Modifier + color -->
+        <div class="form-row row-3">
+          <div class="lab">Name Modifier</div>
+          <input id="nameMod" type="text" placeholder="EX / MAX / etc"/>
+          <button id="c_nameModSw" class="swatch-btn" type="button" title="Modifier color">
+            <span class="swatch"></span>
+          </button>
+          <input id="c_nameMod" class="hidden-color" type="color" value="#8cd6ff"/>
+        </div>
+
+        <!-- Element + color -->
+        <div class="form-row row-3">
+          <div class="lab">Element</div>
           <select id="element">
             <option value="calm">Calm</option>
             <option value="busy">Busy</option>
             <option value="friendly">Friendly</option>
             <option value="chaotic">Chaotic</option>
           </select>
-        </label>
+          <button id="c_elementSw" class="swatch-btn" type="button" title="Element badge color">
+            <span class="swatch"></span>
+          </button>
+          <input id="c_element" class="hidden-color" type="color" value="#cfe8ff"/>
+        </div>
 
-        <!-- Type/Stage -->
-        <label class="form-row row-2">
-          <span class="lab">Type / Stage</span>
+        <!-- Type / Stage + color -->
+        <div class="form-row row-3">
+          <div class="lab">Type / Stage</div>
           <select id="stage">
             <option value="base">Base</option>
             <option value="step1">Step 1</option>
             <option value="step2">Step 2</option>
           </select>
-        </label>
+          <button id="c_stageSw" class="swatch-btn" type="button" title="Stage text color">
+            <span class="swatch"></span>
+          </button>
+          <input id="c_stage" class="hidden-color" type="color" value="#cfe8ff"/>
+        </div>
 
-        <!-- Previous Stage Image (shown only if stage != base) -->
-        <label id="prevImgRow" class="form-row row-2" style="display:none">
-          <span class="lab">Previous Stage Image</span>
-          <input id="prevImg" type="file" accept="image/*" />
-        </label>
+        <!-- Previous stage image (only shows when not Base) -->
+        <div class="form-row row-3" id="prevImgRow" style="display:none">
+          <div class="lab">Previous Stage Img</div>
+          <input id="prevImg" type="file" accept="image/*"/>
+          <button id="removePrevImg" class="remove-btn" type="button" title="Remove previous image">
+            <span class="x">×</span>
+          </button>
+        </div>
+
+        <!-- Main image + remove -->
+        <div class="form-row row-3">
+          <div class="lab">Main Image</div>
+          <input id="mainImg" type="file" accept="image/*"/>
+          <button id="removeMainImg" class="remove-btn" type="button" title="Remove main image">
+            <span class="x">×</span>
+          </button>
+        </div>
 
         <!-- Layout -->
-        <label class="form-row row-2">
-          <span class="lab">Layout</span>
+        <div class="form-row row-2">
+          <div class="lab">Layout</div>
           <select id="layoutMode">
             <option value="standard">Standard</option>
             <option value="full">Full Art</option>
           </select>
-        </label>
+        </div>
 
-        <!-- Background colors (swatch-only) — under Layout; hidden when Full Art -->
-        <div id="bgTopRow" class="form-row row-2">
-          <span class="lab">BG Top Color</span>
+        <!-- BG top (only when not full art) -->
+        <div class="form-row row-2" id="bgTopRow">
+          <div class="lab">BG Top</div>
           <div class="color-input solo">
-            <input id="bgTop" class="hidden-color" type="color" value="#0a0d10">
-            <button id="bgTopSwatch" class="swatch-btn" type="button" aria-label="Pick top color">
-              <span class="swatch"></span>
-            </button>
+            <button id="bgTopSwatch" class="swatch-btn" type="button"><span class="swatch"></span></button>
+            <input id="bgTop" class="hidden-color" type="color" value="#0a0d10"/>
           </div>
         </div>
 
-        <div id="bgBottomRow" class="form-row row-2">
-          <span class="lab">BG Bottom Color</span>
+        <!-- BG bottom (only when not full art) -->
+        <div class="form-row row-2" id="bgBottomRow">
+          <div class="lab">BG Bottom</div>
           <div class="color-input solo">
-            <input id="bgBottom" class="hidden-color" type="color" value="#0b0f12">
-            <button id="bgBottomSwatch" class="swatch-btn" type="button" aria-label="Pick bottom color">
-              <span class="swatch"></span>
-            </button>
+            <button id="bgBottomSwatch" class="swatch-btn" type="button"><span class="swatch"></span></button>
+            <input id="bgBottom" class="hidden-color" type="color" value="#0b0f12"/>
           </div>
         </div>
 
-        <!-- Card Artwork -->
-        <label class="form-row row-2">
-          <span class="lab">Card Artwork</span>
-          <input id="mainImg" type="file" accept="image/*" />
-        </label>
-
-        <!-- Socials (ICON : LABEL : FIELD : COLOR) -->
-        <fieldset class="socials">
+        <!-- Socials -->
+        <fieldset class="socials col2">
           <legend>Socials</legend>
 
-          <div class="form-row row-4 social-row">
-            <img class="icon-sm" src="assets/youtube.svg" alt="">
-            <span class="lab">YouTube</span>
-            <input id="youtube" type="text" placeholder="YouTube name" />
-            <div class="color-cell">
-              <input id="c_social_yt" type="color" class="hidden-color">
-              <button id="c_social_ytSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-            </div>
+          <div class="social-row row-4">
+            <img class="icon-sm" src="assets/youtube.svg" alt="YouTube">
+            <div class="lab">YouTube</div>
+            <input id="youtube" type="text" placeholder="Channel name"/>
+            <button id="c_social_ytSw" class="swatch-btn" type="button" title="YouTube text color"><span class="swatch"></span></button>
+            <input id="c_social_yt" class="hidden-color" type="color" value="#b7ccde"/>
           </div>
 
-          <div class="form-row row-4 social-row">
-            <img class="icon-sm" src="assets/twitch.svg" alt="">
-            <span class="lab">Twitch</span>
-            <input id="twitch" type="text" placeholder="Twitch name" />
-            <div class="color-cell">
-              <input id="c_social_tw" type="color" class="hidden-color">
-              <button id="c_social_twSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-            </div>
+          <div class="social-row row-4">
+            <img class="icon-sm" src="assets/twitch.svg" alt="Twitch">
+            <div class="lab">Twitch</div>
+            <input id="twitch" type="text" placeholder="Channel name"/>
+            <button id="c_social_twSw" class="swatch-btn" type="button" title="Twitch text color"><span class="swatch"></span></button>
+            <input id="c_social_tw" class="hidden-color" type="color" value="#b7ccde"/>
           </div>
 
-          <div class="form-row row-4 social-row">
-            <img class="icon-sm" src="assets/instagram.svg" alt="">
-            <span class="lab">Instagram</span>
-            <input id="instagram" type="text" placeholder="Instagram name" />
-            <div class="color-cell">
-              <input id="c_social_ig" type="color" class="hidden-color">
-              <button id="c_social_igSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-            </div>
+          <div class="social-row row-4">
+            <img class="icon-sm" src="assets/instagram.svg" alt="Instagram">
+            <div class="lab">Instagram</div>
+            <input id="instagram" type="text" placeholder="@handle"/>
+            <button id="c_social_igSw" class="swatch-btn" type="button" title="Instagram text color"><span class="swatch"></span></button>
+            <input id="c_social_ig" class="hidden-color" type="color" value="#b7ccde"/>
           </div>
         </fieldset>
-      </div>
-    </section>
 
-    <!-- CANVAS -->
-    <section class="canvasZone">
+      </div>
+    </aside>
+
+    <!-- CANVAS / PREVIEW -->
+    <main class="canvasZone">
       <div class="card-viewport">
         <div class="card" id="card">
-          <div class="card-inner" aria-hidden="true"></div>
+          <div class="card-inner"></div>
 
           <div class="frame">
             <div class="frame-corner tl"></div>
             <div class="frame-corner tr"></div>
-            <div class="frame-corner bl"></div>
             <div class="frame-corner br"></div>
+            <div class="frame-corner bl"></div>
           </div>
 
           <header class="card-head">
-            <div id="elementBadge" class="badge element calm">CALM</div>
+            <span class="badge element calm" id="elementBadge">CALM</span>
             <div class="title">
-              <span id="titleName">Neon Duck</span>
+              <span id="titleName"> </span>
               <span id="titleMod"></span>
             </div>
             <div class="stage">
               <span id="stageText">Base</span>
-              <img id="prevThumb" alt="">
+              <img id="prevThumb" alt="Previous stage"/>
             </div>
           </header>
 
-          <div class="card-art">
-            <img id="artImg" alt="">
-          </div>
-          <div class="art-spacer" aria-hidden="true"></div>
+          <div class="card-art"><img id="artImg" alt="Art"/></div>
+          <div class="art-spacer"></div>
 
           <div class="card-socials">
-            <div class="socialItem" data-kind="youtube">
-              <img class="icon" src="assets/youtube.svg" alt="YouTube">
-              <span id="ytName"></span>
+            <div class="socialItem">
+              <img class="icon" src="assets/youtube.svg" alt="YouTube"><span id="ytName"></span>
             </div>
-            <div class="socialItem" data-kind="twitch">
-              <img class="icon" src="assets/twitch.svg" alt="Twitch">
-              <span id="twName"></span>
+            <div class="socialItem">
+              <img class="icon" src="assets/twitch.svg" alt="Twitch"><span id="twName"></span>
             </div>
-            <div class="socialItem" data-kind="instagram">
-              <img class="icon" src="assets/instagram.svg" alt="Instagram">
-              <span id="igName"></span>
+            <div class="socialItem">
+              <img class="icon" src="assets/instagram.svg" alt="Instagram"><span id="igName"></span>
             </div>
           </div>
 
           <section class="card-ability">
-            <div class="aa-head aa-ability">
-              <span class="ability-flag">ABILITY</span>
-              <span id="abilityTitle" class="aa-title"></span>
+            <div class="aa-head">
+              <span class="ability-flag">Ability</span>
+              <span class="aa-title" id="abilityTitle"></span>
             </div>
             <p id="abilityDesc"></p>
           </section>
 
           <section class="card-attack attack1">
             <div class="aa-head">
-              <span id="attackTitle" class="aa-title"></span>
+              <span class="aa-title" id="attackTitle"></span>
               <span class="value" id="attackVal"></span>
             </div>
             <p id="attackEffectText"></p>
@@ -201,145 +197,124 @@
 
           <section class="card-attack attack2">
             <div class="aa-head">
-              <span id="attack2Title" class="aa-title"></span>
+              <span class="aa-title" id="attack2Title"></span>
               <span class="value" id="attack2Val"></span>
             </div>
             <p id="attack2EffectText"></p>
           </section>
 
-          <p class="card-flavour" id="flavourText"></p>
+          <div class="card-flavour" id="flavourText"></div>
 
-          <div class="card-credit">
+          <footer class="card-credit">
             <div class="credit-left">
-              <img id="setIconImg" alt="">
+              <img id="setIconImg" alt="Set icon"/>
               <span id="setNameText"></span>
             </div>
-            <div class="credit-center">Created by <strong>Akurosia Kamo</strong> &amp; <strong>Evidiya</strong></div>
+            <div class="credit-center">Created By Akurosia Kamo &amp; Evidiya</div>
             <div class="credit-right">
               <span id="numOut"></span>
-              <span class="rarity"><svg id="rarityIcon" viewBox="0 0 24 24"></svg></span>
+              <span class="rarity"><svg id="rarityIcon" viewBox="0 0 24 24" aria-hidden="true"></svg></span>
             </div>
-          </div>
+          </footer>
         </div>
       </div>
 
-      <div class="buttons buttons-center">
+      <div class="buttons-center">
+        <button id="prefillNormalBtn" type="button">Demo (Standard)</button>
+        <button id="prefillFullBtn" type="button">Demo (Full Art)</button>
         <button id="resetBtn" type="button">Reset</button>
-        <button id="prefillNormalBtn" type="button">Prefill Normal</button>
-        <button id="prefillFullBtn" type="button">Prefill Full Art</button>
         <button id="downloadBtn" type="button">Download PNG</button>
+        <span class="exportNote">Tip: host assets/*.svg to avoid CORS issues for exports.</span>
       </div>
+    </main>
 
-      <div class="exportNote">What you see is what gets exported.</div>
-    </section>
-
-    <!-- RIGHT PANEL — DETAILS + FOOTER -->
-    <section class="panel panel-right">
+    <!-- RIGHT PANEL — Details -->
+    <aside class="panel panel-right">
       <h1>Details</h1>
-
       <div class="grid">
-        <!-- Ability -->
-        <label class="form-row row-3">
-          <span class="lab">Ability Name</span>
-          <input id="abilityName" type="text" placeholder="e.g. Overclock Aura" />
-          <div class="color-cell">
-            <input id="c_abilityName" type="color" class="hidden-color">
-            <button id="c_abilityNameSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
 
-        <label class="form-row row-3">
-          <span class="lab">Ability Text</span>
-          <textarea id="abilityText" rows="2" placeholder="Describe ability…"></textarea>
-          <div class="color-cell">
-            <input id="c_abilityText" type="color" class="hidden-color">
-            <button id="c_abilityTextSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
+        <!-- Ability -->
+        <div class="form-row row-3">
+          <div class="lab">Ability Name</div>
+          <input id="abilityName" type="text" placeholder="Ability title"/>
+          <button id="c_abilityNameSw" class="swatch-btn" type="button" title="Ability name color">
+            <span class="swatch"></span>
+          </button>
+          <input id="c_abilityName" class="hidden-color" type="color" value="#cfe8ff"/>
+        </div>
+        <div class="form-row row-3">
+          <div class="lab">Ability Text</div>
+          <textarea id="abilityText" rows="3" placeholder="Describe the passive effect…"></textarea>
+          <button id="c_abilityTextSw" class="swatch-btn" type="button" title="Ability text color"><span class="swatch"></span></button>
+          <input id="c_abilityText" class="hidden-color" type="color" value="#b1c6d9"/>
+        </div>
 
         <!-- Attack 1 -->
-        <label class="form-row row-3">
-          <span class="lab">Attack #1 Name</span>
-          <input id="attackName" type="text" placeholder="e.g. Circuit Peck" />
-          <div class="color-cell">
-            <input id="c_attackName" type="color" class="hidden-color">
-            <button id="c_attackNameSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
-
-        <label class="form-row row-3">
-          <span class="lab">Attack #1 Value</span>
-          <input id="attackValue" type="text" placeholder="e.g. 70" />
-          <div class="color-cell">
-            <input id="c_attackValue" type="color" class="hidden-color">
-            <button id="c_attackValueSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
-
-        <label class="form-row row-3">
-          <span class="lab">Attack #1 Effect</span>
-          <textarea id="attackEffect" rows="2" placeholder="Optional effect…"></textarea>
-          <div class="color-cell">
-            <input id="c_attackEffect" type="color" class="hidden-color">
-            <button id="c_attackEffectSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
+        <div class="form-row row-3">
+          <div class="lab">Attack 1 Name</div>
+          <input id="attackName" type="text" placeholder="Attack name"/>
+          <button id="c_attackNameSw" class="swatch-btn" type="button" title="Attack name color"><span class="swatch"></span></button>
+          <input id="c_attackName" class="hidden-color" type="color" value="#cfe8ff"/>
+        </div>
+        <div class="form-row row-2">
+          <div class="lab">Attack 1 Value</div>
+          <input id="attackValue" type="text" placeholder="e.g. 70"/>
+        </div>
+        <div class="form-row row-3">
+          <div class="lab">Attack 1 Effect</div>
+          <textarea id="attackEffect" rows="2" placeholder="Optional effect text…"></textarea>
+          <button id="c_attackEffectSw" class="swatch-btn" type="button" title="Attack effect color"><span class="swatch"></span></button>
+          <input id="c_attackEffect" class="hidden-color" type="color" value="#b1c6d9"/>
+        </div>
 
         <!-- Attack 2 -->
-        <label class="form-row row-3">
-          <span class="lab">Attack #2 Name</span>
-          <input id="attack2Name" type="text" placeholder="e.g. Neon Burst" />
-          <div class="color-cell">
-            <input id="c_attack2Name" type="color" class="hidden-color">
-            <button id="c_attack2NameSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
+        <div class="form-row row-3">
+          <div class="lab">Attack 2 Name</div>
+          <input id="attack2Name" type="text" placeholder="Attack name"/>
+          <button id="c_attack2NameSw" class="swatch-btn" type="button" title="Attack 2 name color"><span class="swatch"></span></button>
+          <input id="c_attack2Name" class="hidden-color" type="color" value="#cfe8ff"/>
+        </div>
+        <div class="form-row row-2">
+          <div class="lab">Attack 2 Value</div>
+          <input id="attack2Value" type="text" placeholder="e.g. 90"/>
+        </div>
+        <div class="form-row row-3">
+          <div class="lab">Attack 2 Effect</div>
+          <textarea id="attack2Effect" rows="2" placeholder="Optional effect text…"></textarea>
+          <button id="c_attack2EffectSw" class="swatch-btn" type="button" title="Attack 2 effect color"><span class="swatch"></span></button>
+          <input id="c_attack2Effect" class="hidden-color" type="color" value="#b1c6d9"/>
+        </div>
 
-        <label class="form-row row-3">
-          <span class="lab">Attack #2 Value</span>
-          <input id="attack2Value" type="text" placeholder="e.g. 90" />
-          <div class="color-cell">
-            <input id="c_attack2Value" type="color" class="hidden-color">
-            <button id="c_attack2ValueSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
+        <!-- Flavour -->
+        <div class="form-row row-3">
+          <div class="lab">Flavour Text</div>
+          <textarea id="flavour" rows="3" placeholder="A one-liner that captures the vibe…"></textarea>
+          <button id="c_flavourSw" class="swatch-btn" type="button" title="Flavour color"><span class="swatch"></span></button>
+          <input id="c_flavour" class="hidden-color" type="color" value="#b1c6d9"/>
+        </div>
 
-        <label class="form-row row-3">
-          <span class="lab">Attack #2 Effect</span>
-          <textarea id="attack2Effect" rows="2" placeholder="Optional effect…"></textarea>
-          <div class="color-cell">
-            <input id="c_attack2Effect" type="color" class="hidden-color">
-            <button id="c_attack2EffectSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
-
-        <label class="form-row row-3">
-          <span class="lab">Flavour Text</span>
-          <textarea id="flavour" rows="2" placeholder="Short lore or personality…"></textarea>
-          <div class="color-cell">
-            <input id="c_flavour" type="color" class="hidden-color">
-            <button id="c_flavourSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
-
-        <!-- Footer (Set Icon above Set Name) -->
-        <label class="form-row row-2">
-          <span class="lab">Set Icon</span>
-          <input id="setIcon" type="file" accept="image/*" />
-        </label>
-
-        <label class="form-row row-3">
-          <span class="lab">Set Name</span>
-          <input id="setName" type="text" placeholder="e.g. Night Circuit" />
-          <div class="color-cell">
-            <input id="c_setName" type="color" class="hidden-color">
-            <button id="c_setNameSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
-
-        <!-- Rarity + custom color (SAME LINE) -->
-        <label class="form-row row-3">
-          <span class="lab">Rarity</span>
+        <!-- Footer -->
+        <div class="form-row row-3">
+          <div class="lab">Set Icon</div>
+          <input id="setIcon" type="file" accept="image/*"/>
+          <button id="removeSetIcon" class="remove-btn" type="button" title="Remove set icon">
+            <span class="x">×</span>
+          </button>
+        </div>
+        <div class="form-row row-3">
+          <div class="lab">Set Name</div>
+          <input id="setName" type="text" placeholder="Set name"/>
+          <button id="c_setNameSw" class="swatch-btn" type="button" title="Set name color"><span class="swatch"></span></button>
+          <input id="c_setName" class="hidden-color" type="color" value="#cfe4ff"/>
+        </div>
+        <div class="form-row row-3">
+          <div class="lab">Card Number X/Y</div>
+          <input id="numXY" type="text" placeholder="e.g. 12/99"/>
+          <button id="c_numXYSw" class="swatch-btn" type="button" title="Number color"><span class="swatch"></span></button>
+          <input id="c_numXY" class="hidden-color" type="color" value="#cfe4ff"/>
+        </div>
+        <div class="form-row row-3">
+          <div class="lab">Rarity</div>
           <select id="rarity">
             <option value="common">Common</option>
             <option value="uncommon">Uncommon</option>
@@ -349,23 +324,13 @@
             <option value="mythic">Mythic</option>
             <option value="secret">Secret</option>
           </select>
-          <div class="color-input solo">
-            <input id="c_rarity" class="hidden-color" type="color" value="#c9c9c9">
-            <button id="c_raritySw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
+          <button id="c_raritySw" class="swatch-btn" type="button" title="Rarity icon color"><span class="swatch"></span></button>
+          <input id="c_rarity" class="hidden-color" type="color" value="#c9c9c9"/>
+        </div>
 
-        <label class="form-row row-3">
-          <span class="lab">Card Number (X/Y)</span>
-          <input id="numXY" type="text" placeholder="e.g. 12/99" />
-          <div class="color-cell">
-            <input id="c_numXY" type="color" class="hidden-color">
-            <button id="c_numXYSw" class="swatch-btn" type="button"><span class="swatch"></span></button>
-          </div>
-        </label>
       </div>
-    </section>
-  </main>
+    </aside>
+  </div>
 
   <script src="app.js"></script>
 </body>

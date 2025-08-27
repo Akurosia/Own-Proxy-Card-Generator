@@ -77,9 +77,19 @@ textarea{resize:vertical;width:300px}
 
 /* Canvas & buttons */
 .canvasZone{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
-.card-viewport{ width:calc(var(--card-w)*var(--card-scale)); height:calc(var(--card-h)*var(--card-scale)); display:flex; align-items:flex-start; justify-content:center }
+.card-viewport{ height:calc(var(--card-h)*var(--card-scale)); display:flex; align-items:flex-start; justify-content:center }
 .card-viewport>.card{ transform:scale(var(--card-scale)); transform-origin:top center }
-.buttons-center{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ALIGN the buttons to the card width */
+.buttons-center{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  width: calc(var(--card-w) * var(--card-scale));
+  justify-content:center;
+  margin: 0 auto;
+}
+
 button{border:1px solid #1a2129;background:#0f151a;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer;font:700 12px var(--font-display)}
 button:hover{border-color:#293544}
 .exportNote{color:#8ea0b2;font-size:12px}
@@ -107,12 +117,21 @@ button:hover{border-color:#293544}
   position:relative;z-index:2;display:grid;grid-template-columns:90px 1fr 90px;align-items:center;
   padding:40px 45px 15px;border-bottom:0;
 }
-.badge.element{padding:6px 9px;border-radius:10px;border:1px solid #182029;background:#0f1419;font:700 13px var(--font-display);text-transform:uppercase}
+.badge.element{
+  padding:6px 9px;border-radius:10px;border:1px solid #182029;background:#0f1419;
+  font:700 13px var(--font-display);text-transform:uppercase;
+  margin:auto; /* NEW: center the badge within its grid cell */
+}
 .title{display:flex;gap:8px;justify-content:center}
 #titleName{font:700 28px var(--font-display);color:#cfe8ff}
 #titleMod{font:800 22px var(--font-display);padding:2px 8px;border:1px solid #182029;border-radius:8px;background:#0e1419;color:#8cd6ff}
 #titleMod:empty{display:none}
-.stage{justify-self=end;display:flex;align-items:center;gap:8px}
+.stage{
+  justify-self: end;  /* FIXED: was a typo before */
+  display:flex; align-items:center; gap:8px;
+  margin-right:0;      /* ensure it hugs the right edge of its 90px column */
+  justify-content:flex-end; /* push inner content to the far right */
+}
 .stage img{display:none;width:40px;height:40px;border-radius:8px}
 
 /* Art & sections — keep 30px side margins */
@@ -142,7 +161,7 @@ button:hover{border-color:#293544}
   position:absolute;
   left:35px;
   right:35px;
-  bottom:60px;
+  bottom:80px;
   font-style:italic;
   text-align:center;
   border-left:3px solid #1d2a34;
@@ -175,6 +194,19 @@ button:hover{border-color:#293544}
   background: linear-gradient(180deg, rgba(5,8,12,.75), rgba(5,8,12,.05) 90%);
   border-bottom:0;
 }
+.remove-btn{
+  width:28px; height:28px;
+  border:1px solid #5a2230;
+  border-radius:6px;
+  background:#1a0e11;
+  display:inline-flex; align-items:center; justify-content:center;
+  font:800 16px var(--font-display);
+  color:#ff5c5c;
+  line-height:1;
+  cursor:pointer;
+}
+.remove-btn:hover{ border-color:#7b2d3c; color:#ff7a7a }
+.remove-btn .x{ pointer-events:none; }
 
 /* Short screens */
 @media (max-height:900px){ :root{ --card-scale:0.78 } }

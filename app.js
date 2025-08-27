@@ -1,4 +1,4 @@
-/* Stream Saga — exact-size export via off-screen clone (fixes height), robust rarity color, SVG icons inline, square corners on export */
+/* Stream Saga — remove-image buttons hardened, color toggles for Mod/Element/Stage, robust reset, exact-size export */
 
 const el = id => document.getElementById(id);
 
@@ -24,7 +24,7 @@ const state = {
 function bindInputs(){
   const map = [
     ["name","input", v => { state.name=v; drawText(); }],
-    ["nameMod","change", v => { state.nameMod=v; drawText(); }],
+    ["nameMod","input", v => { state.nameMod=v; drawText(); }],
     ["element","change", v => { state.element=v; drawElement(); }],
     ["stage","change", v => { state.stage=v; drawStage(); }],
     ["layoutMode","change", v => { setLayout(v); }],
@@ -61,20 +61,34 @@ function bindInputs(){
     if(n) n.addEventListener(ev, e=>fn(e.target.value));
   });
 
-  // files
+  /* Files + remove buttons (stronger handler) */
   el("mainImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.artURL=url; drawArt(); }));
   el("prevImg").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.prevURL=url; drawStage(); }));
   el("setIcon").addEventListener("change", e => loadFile(e.target.files[0], url=>{ state.setIconURL=url; drawCredit(); }));
 
-  // BG color swatches (swatch-only)
+  const wireRemove = (btnId, fileId, clearFn) => {
+    const b=el(btnId), f=el(fileId);
+    if(!b || !f) return;
+    b.addEventListener("click", (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      try { f.value = ""; } catch(_) {}
+      clearFn();
+    }, {passive:false});
+  };
+  wireRemove("removeMainImg","mainImg", ()=>{ state.artURL=""; drawArt(); });
+  wireRemove("removePrevImg","prevImg", ()=>{ state.prevURL=""; drawStage(); });
+  wireRemove("removeSetIcon","setIcon", ()=>{ state.setIconURL=""; drawCredit(); });
+
+  /* BG color swatches (swatch-only) */
   setupSwatch("bgTop","bgTopSwatch", updateBgColors);
   setupSwatch("bgBottom","bgBottomSwatch", updateBgColors);
   updateBgColors();
 
-  // Per-field text colors (includes socials)
+  /* Per-field text colors (includes socials and nameMod/element/stage) */
   initTextColorSwatches();
 
-  // RARITY color picker
+  /* RARITY color picker */
   setupSwatch("c_rarity","c_raritySw", ()=> {
     const val = el("c_rarity").value;
     const svg = el("rarityIcon");
@@ -86,13 +100,13 @@ function bindInputs(){
     }
   });
 
-  // buttons
+  /* Buttons */
   el("resetBtn").addEventListener("click", resetForm);
   el("prefillNormalBtn").addEventListener("click", prefillNormal);
   el("prefillFullBtn").addEventListener("click", prefillFullArt);
   el("downloadBtn").addEventListener("click", downloadPNG);
 
-  // initial visibility
+  /* Initial visibility */
   setTimeout(()=>{ drawStage(); setLayout(el("layoutMode")?.value || "standard"); },0);
 }
 
@@ -103,7 +117,7 @@ function loadFile(file, cb){
   r.readAsDataURL(file);
 }
 
-/* Swatch-only helpers */
+/* Swatch helpers */
 function setupSwatch(inputId, swatchBtnId, onChange){
   const input = el(inputId);
   const btn = el(swatchBtnId);
@@ -118,6 +132,9 @@ function setupSwatch(inputId, swatchBtnId, onChange){
 /* Text color swatches mapping */
 const textColorMap = [
   ["c_name","c_nameSw","#titleName"],
+  ["c_nameMod","c_nameModSw","#titleMod"],
+  ["c_element","c_elementSw","#elementBadge"],
+  ["c_stage","c_stageSw","#stageText"],
   ["c_abilityName","c_abilityNameSw","#abilityTitle"],
   ["c_abilityText","c_abilityTextSw","#abilityDesc"],
   ["c_attackName","c_attackNameSw","#attackTitle"],
@@ -185,7 +202,12 @@ function drawStage(){
 }
 
 /* Drawers */
-function drawText(){ el("titleName").textContent = state.name || " "; el("titleMod").textContent = state.nameMod || ""; }
+function drawText(){
+  el("titleName").textContent = state.name || " ";
+  const mod = el("titleMod");
+  mod.textContent = state.nameMod || "";
+  mod.style.display = state.nameMod ? "inline-flex" : "none";
+}
 function drawElement(){ const b=el("elementBadge"); b.textContent=(state.element||"").toUpperCase(); b.className="badge element "+state.element; }
 function drawArt(){ const img=el("artImg"); if(state.artURL){ img.src=state.artURL; img.style.display="block"; } else { img.removeAttribute("src"); img.style.display="none"; } }
 function drawSocials(){
@@ -227,7 +249,7 @@ function drawAttack2(){
 }
 function drawFlavour(){ el("flavourText").textContent=state.flavour || ""; }
 
-/* Rarity drawing (shapes + robust color application) */
+/* Rarity drawing */
 function drawCredit(){
   el("setNameText").textContent=state.setName||""; el("numOut").textContent=state.numXY||"";
 
@@ -271,7 +293,7 @@ function currentRarityDefaultColor(r){
   }[r] || "#c9c9c9");
 }
 
-/* === Inline social icons as real <svg> nodes so exporters capture them === */
+/* Inline SVG icons so exporters capture them */
 async function inlineSocialSVGIcons(root){
   const imgs = Array.from(root.querySelectorAll("img.icon"));
   const svgImgs = imgs.filter(img => /\.svg(\?.*)?$/i.test(img.getAttribute("src") || ""));
@@ -283,8 +305,7 @@ async function inlineSocialSVGIcons(root){
       const doc = parser.parseFromString(text, "image/svg+xml");
       const svg = doc.documentElement;
       if(!svg || svg.nodeName.toLowerCase() !== "svg") return;
-      svg.removeAttribute("width");
-      svg.removeAttribute("height");
+      svg.removeAttribute("width"); svg.removeAttribute("height");
       svg.setAttribute("preserveAspectRatio","xMidYMid meet");
       const cls = (img.getAttribute("class")||"") + " svg-inline";
       svg.setAttribute("class", cls.trim());
@@ -390,7 +411,7 @@ async function ensureExportLibs(){
   if(!window.domtoimage) await loadScript('dom-to-image-more.js');
 }
 
-/* ----- Exact-size export using an off-screen clone (square corners) ----- */
+/* Exact-size export using an off-screen clone (square corners) */
 function cssVarPx(name){
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const m = v.match(/([\d.]+)/);
@@ -403,13 +424,11 @@ async function downloadPNG(){
   await ensureExportLibs();
   if(document.fonts && document.fonts.ready) await document.fonts.ready;
 
-  // Off-screen clone to avoid transforms/media-query effects
   const w = cssVarPx("--card-w") || card.offsetWidth;
   const h = cssVarPx("--card-h") || card.offsetHeight;
 
   const clone = card.cloneNode(true);
 
-  // Preserve background variables
   const cs = getComputedStyle(card);
   const top = (cs.getPropertyValue('--bg-top')||'#0a0d10').trim();
   const bottom = (cs.getPropertyValue('--bg-bottom')||'#0b0f12').trim();
@@ -422,40 +441,32 @@ async function downloadPNG(){
     width: w + "px",
     height: h + "px",
     backgroundImage: `linear-gradient(180deg, ${top}, ${bottom})`,
-    borderRadius: "0px" // <— SQUARE CORNERS FOR EXPORT
+    borderRadius: "0px"
   });
   clone.style.setProperty("--bg-top", top);
   clone.style.setProperty("--bg-bottom", bottom);
 
-  // Ensure icons are inline SVGs inside the clone
   document.body.appendChild(clone);
   await inlineSocialSVGIcons(clone);
 
-  // Wait any <img> inside clone
   const imgs = Array.from(clone.querySelectorAll("img")).filter(i=>i.src && !i.complete);
   await Promise.all(imgs.map(i=> new Promise(r=> i.addEventListener("load", r, {once:true}))));
 
   const filename = (state.name || 'card') + '.png';
-  const PIXEL_RATIO = 1; // set to 2 for 1500×2100 output
+  const PIXEL_RATIO = 1;
 
   try{
     const dataUrl = await window.htmlToImage.toPng(clone,{
-      width: w,
-      height: h,
-      pixelRatio: PIXEL_RATIO,
-      backgroundColor: null,
-      cacheBust: true,
-      style: { transform: "none", width: w+"px", height: h+"px", borderRadius: "0px" }
+      width: w, height: h, pixelRatio: PIXEL_RATIO,
+      backgroundColor: null, cacheBust: true,
+      style: { transform:"none", width:w+"px", height:h+"px", borderRadius:"0px" }
     });
     triggerDownload(dataUrl, filename);
   }catch(e1){
     try{
       const dataUrl2 = await window.domtoimage.toPng(clone,{
-        quality: 1,
-        bgcolor: 'transparent',
-        width: w,
-        height: h,
-        style: { transform: "none", width: w+"px", height: h+"px", backgroundImage:`linear-gradient(180deg, ${top}, ${bottom})`, borderRadius: "0px" }
+        quality:1, bgcolor:'transparent', width:w, height:h,
+        style:{ transform:"none", width:w+"px", height:h+"px", backgroundImage:`linear-gradient(180deg, ${top}, ${bottom})`, borderRadius:"0px" }
       });
       triggerDownload(dataUrl2, filename);
     }catch(e2){
@@ -466,24 +477,39 @@ async function downloadPNG(){
     clone.remove();
   }
 }
-
 function triggerDownload(dataUrl, filename){
   const a=document.createElement('a');
   a.download=filename; a.href=dataUrl; document.body.appendChild(a); a.click(); a.remove();
 }
 
-/* Reset */
+/* Reset — clear all fields / selects to first option, clear files & state */
 function resetForm(){
-  Object.keys(state).forEach(k=>state[k]="");
-  state.element="calm"; state.stage="base"; state.rarity="common"; state.layout="standard";
-  state.rarityColorOverride=false; state.rarityColor=currentRarityDefaultColor(state.rarity);
+  document.querySelectorAll('input[type="text"],input[type="url"],input[type="number"]').forEach(i=> i.value="");
+  document.querySelectorAll('textarea').forEach(t=> t.value="");
+  document.querySelectorAll('select').forEach(s=> s.selectedIndex = 0);
+  document.querySelectorAll('input[type="file"]').forEach(f=> f.value="");
 
-  setLayout("standard");
-  drawText(); drawElement(); drawStage(); drawArt(); drawSocials(); drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
+  Object.assign(state, {
+    name:"", nameMod:"", element: el("element")?.value || "calm",
+    stage: el("stage")?.value || "base",
+    layout: el("layoutMode")?.value || "standard",
+    youtube:"", twitch:"", instagram:"",
+    abilityName:"", abilityText:"",
+    attackName:"", attackValue:"", attackEffect:"",
+    attack2Name:"", attack2Value:"", attack2Effect:"",
+    flavour:"",
+    numXY:"", setName:"",
+    rarity: el("rarity")?.value || "common",
+    artURL:"", prevURL:"", setIconURL:"",
+    rarityColorOverride:false,
+    rarityColor: currentRarityDefaultColor(el("rarity")?.value || "common")
+  });
 
-  const t=el("bgTop"), b=el("bgBottom");
-  if(t) t.value="#0a0d10"; if(b) b.value="#0b0f12";
+  setLayout(state.layout);
   updateBgColors();
+
+  drawText(); drawElement(); drawStage(); drawArt(); drawSocials();
+  drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
 
   initTextColorSwatches();
   syncRarityColorSwatch();
