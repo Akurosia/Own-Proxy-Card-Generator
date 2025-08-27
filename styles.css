@@ -1,11 +1,11 @@
 /* Stream Saga – Panels aligned + compact rows + swatch-only color pickers
-   Card size exactly 750×1050px (5:7 aspect = 2.5"×3.5" @300 DPI) */
+   Card base size set to 745×1040px (remembered) */
 
 :root{
   --bg:#0b0f12; --panel:#12171c; --ink:#d4e1ee; --muted:#8ea0b2; --line:#1c232b;
   --blue:#39b8ff; --red:#ff3b3b;
 
-  /* Card base (export size) */
+  /* Card base (export size) — REMEMBERED */
   --card-w:745px;
   --card-h:1040px;
   --card-scale: 0.84;
@@ -112,7 +112,7 @@ button:hover{border-color:#293544}
 #titleName{font:700 28px var(--font-display);color:#cfe8ff}
 #titleMod{font:800 22px var(--font-display);padding:2px 8px;border:1px solid #182029;border-radius:8px;background:#0e1419;color:#8cd6ff}
 #titleMod:empty{display:none}
-.stage{justify-self:end;display:flex;align-items:center;gap:8px}
+.stage{justify-self=end;display:flex;align-items:center;gap:8px}
 .stage img{display:none;width:40px;height:40px;border-radius:8px}
 
 /* Art & sections — keep 30px side margins */
@@ -120,10 +120,9 @@ button:hover{border-color:#293544}
 .card-art img{width:100%;height:100%;object-fit:cover}
 .art-spacer{display:none}
 
-/* Socials (now forced above art in full-art mode) */
+/* Socials (above art in full-art) */
 .card-socials{
-  position:relative;             /* NEW */
-  z-index:2;                     /* NEW */
+  position:relative; z-index:2;
   display:flex;justify-content:center;align-items:center;gap:16px;
   margin:12px 30px 0;padding:8px 10px;border:1px solid #141b22;border-radius:12px;background:#0f1419
 }
@@ -138,7 +137,7 @@ button:hover{border-color:#293544}
 .card-attack .value{margin-left:auto;font:800 17px var(--font-display);color:#ffd8d8}
 .card-ability p,.card-attack p{margin:6px 0 0;color:#b1c6d9;font:400 12.5px var(--font-ui)}
 
-/* Flavour — requested exact properties */
+/* Flavour */
 .card-flavour{
   position:absolute;
   left:35px;
@@ -152,7 +151,7 @@ button:hover{border-color:#293544}
 }
 .card-flavour:empty{display:none}
 
-/* Credit bar — requested exact spacing */
+/* Credit bar */
 .card-credit{
   position:absolute;left:42px;right:30px;bottom:30px;height:60px;
   display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;
