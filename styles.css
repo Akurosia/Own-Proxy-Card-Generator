@@ -6,12 +6,12 @@
   --blue:#39b8ff; --red:#ff3b3b;
 
   /* Card base (export size) — REMEMBERED */
-  --card-w:745px;
+  --card-w:744px;
   --card-h:1040px;
   --card-scale: 0.84;
 
   --panel-w-r: 320px;
-  --panel-w-l: 455px;
+  --panel-w-l: 510px;
 
   --radius-lg:28px; --radius-md:18px; --radius-sm:10px;
   --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-7:28px; --s-8:32px;
