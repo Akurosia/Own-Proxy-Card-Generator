@@ -107,10 +107,10 @@ button:hover{border-color:#293544}
 .frame{position:absolute;inset:30px;z-index:1;pointer-events:none}
 .frame-corner{position:absolute;width:60px;height:60px}
 .frame-corner::before{content:"";position:absolute;inset:0;border:2px solid;background:transparent}
-.frame-corner.tl{top:0;left:0}.frame-corner.tl::before{border-color:var(--red) transparent transparent var(--red);border-radius:26px 0 0 0}
-.frame-corner.tr{top:0;right:0}.frame-corner.tr::before{border-color:var(--blue) var(--blue) transparent transparent;border-radius:0 26px 0 0}
-.frame-corner.br{bottom:0;right:0}.frame-corner.br::before{border-color:transparent var(--red) var(--red) transparent;border-radius:0 0 26px 0}
-.frame-corner.bl{bottom:0;left:0}.frame-corner.bl::before{border-color:transparent transparent var(--blue) var(--blue);border-radius:0 0 0 26px}
+.frame-corner.tl{top:0;left:0}.frame-corner.tl::before{border-color:var(--red) transparent transparent var(--red);border-radius:18px 0 0 0}
+.frame-corner.tr{top:0;right:0}.frame-corner.tr::before{border-color:var(--blue) var(--blue) transparent transparent;border-radius:0 18px 0 0}
+.frame-corner.br{bottom:0;right:0}.frame-corner.br::before{border-color:transparent var(--red) var(--red) transparent;border-radius:0 0 18px 0}
+.frame-corner.bl{bottom:0;left:0}.frame-corner.bl::before{border-color:transparent transparent var(--blue) var(--blue);border-radius:0 0 0 18px}
 
 /* Header (no bottom border) */
 .card-head{
@@ -118,7 +118,7 @@ button:hover{border-color:#293544}
   padding:40px 45px 15px;border-bottom:0;
 }
 .badge.element{
-  padding:6px 9px;border-radius:10px;border:1px solid #182029;background:#0f1419;
+  padding:6px 9px;border-radius:10px;border:1px solid #182029;background:#0f14196A;
   font:700 13px var(--font-display);text-transform:uppercase;
   margin:auto; /* NEW: center the badge within its grid cell */
 }
@@ -143,13 +143,13 @@ button:hover{border-color:#293544}
 .card-socials{
   position:relative; z-index:2;
   display:flex;justify-content:center;align-items:center;gap:16px;
-  margin:12px 30px 0;padding:8px 10px;border:1px solid #141b22;border-radius:12px;background:#0f1419
+  margin:12px 30px 0;padding:8px 10px;border:1px solid #141b22;border-radius:12px;background:#0f14196A
 }
 .socialItem{display:flex;align-items:center;gap:8px;color:#b7ccde;font:700 12px var(--font-display)}
 .socialItem span:empty{display:none}
 .socialItem .icon{display:block;width:18px;height:18px}
 
-.card-ability,.card-attack{position:relative;z-index:2;margin:12px 30px 0;padding:8px 10px;border:1px solid #141b22;border-radius:10px;background:#0f1419;display:none}
+.card-ability,.card-attack{position:relative;z-index:2;margin:12px 30px 0;padding:8px 10px;border:1px solid #141b22;border-radius:10px;background:#0f14196A;display:none}
 .aa-head{display:flex;gap:8px;align-items:center;justify-content:flex-start;color:#cfe8ff}
 .aa-title{font:700 15px var(--font-display)}
 .ability-flag{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:8px;border:1px solid #1c2a36;background:linear-gradient(90deg,rgba(57,184,255,.18),rgba(255,59,59,.18));color:#d8ecff;font:800 11px var(--font-display);text-transform:uppercase;letter-spacing:.6px;box-shadow:0 0 8px rgba(57,184,255,.18),inset 0 0 8px rgba(255,59,59,.08)}
@@ -165,7 +165,7 @@ button:hover{border-color:#293544}
   font-style:italic;
   text-align:center;
   border-left:3px solid #1d2a34;
-  background:#0e1318;
+  background:#0e13186A;
   z-index:2;
 }
 .card-flavour:empty{display:none}
@@ -191,7 +191,6 @@ button:hover{border-color:#293544}
 .card.fullart .art-spacer{ display:block; height:500px; margin:8px 30px 0; }
 .card.fullart .card-head{
   position:relative; z-index:2;
-  background: linear-gradient(180deg, rgba(5,8,12,.75), rgba(5,8,12,.05) 90%);
   border-bottom:0;
 }
 .remove-btn{
