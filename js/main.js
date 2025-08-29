@@ -64,6 +64,11 @@ function bindInputs(){
   wireRemove("removeMainImg","mainImg", ()=>{ state.artURL=""; drawArt(); });
   wireRemove("removePrevImg","prevImg", ()=>{ state.prevURL=""; drawStage(); });
   wireRemove("removeSetIcon","setIcon", ()=>{ state.setIconURL=""; drawCredit(); });
+  // Colors
+  setupSwatch("bgTop","bgTopSwatch", updateBgColors);
+  setupSwatch("bgBottom","bgBottomSwatch", updateBgColors);
+  updateBgColors();
+  initTextColorSwatches();
 
   // Rarity color override swatch
   const rarityInput = el("c_rarity");
@@ -90,6 +95,21 @@ function bindInputs(){
   // el("downloadCompatBtn")?.addEventListener("click", () =>
   //   exportCardPNGCompat({ fileName: (state.name || "card") + "_compat.png" })
   // );
+}
+function setupSwatch(inputId, swatchBtnId, onChange){
+  const input = el(inputId); const btn = el(swatchBtnId); if(!input||!btn) return;
+  const box = btn.querySelector('.swatch');
+  const sync = ()=>{ if(box) box.style.background = input.value || "#000"; if(onChange) onChange(); };
+  btn.addEventListener('click', ()=> input.click());
+  input.addEventListener('input', sync);
+  if(box) box.style.background = input.value || "#000";
+
+}function updateBgColors(){
+  const top = el("bgTop").value || "#0a0d10";
+  const bottom = el("bgBottom").value || "#0b0f12";
+  const card = el("card");
+  card.style.setProperty("--bg-top", top);
+  card.style.setProperty("--bg-bottom", bottom);
 }
 
 /* ---- Color swatch helper for rarity ---- */
