@@ -77,8 +77,8 @@ textarea{resize:vertical;width:300px}
 
 /* Canvas & buttons */
 .canvasZone{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
-.card-viewport{ height:calc(var(--card-h)*var(--card-scale)); display:flex; align-items:flex-start; justify-content:center }
-.card-viewport>.card{ transform:scale(var(--card-scale)); transform-origin:top center }
+.card-viewport{ height:calc(var(--card-h)*var(--card-scale)); width: 100%; }
+.card-viewport>.card{ transform:scale(var(--card-scale)); transform-origin:top left }
 
 /* ALIGN the buttons to the card width */
 .buttons-center{
