@@ -1,11 +1,7 @@
 // js/templates.js
 import { el, show, makeDataImage } from "./utils.js";
 import { state, rarityDefaultColor } from "./state.js";
-import {
-  drawText, drawElement, drawStage, drawArt, drawSocials,
-  drawAbility, drawAttack1, drawAttack2, drawFlavour, drawCredit,
-  initTextColorSwatches
-} from "./render.js";
+import { drawAbility, drawArt, drawAttack1, drawAttack2, drawBgStandard, drawCredit, drawElement, drawFlavour, drawSocials, drawStage, drawText, initTextColorSwatches } from "./render.js";
 
 /* Demo prefills (templates) */
 
@@ -13,7 +9,7 @@ export function prefillNormal(){
   setLayout("standard");
   Object.assign(state, {
     name:"Neon Duck", nameMod:"EX", element:"chaotic", stage:"step1",
-    youtube:"NeonDuckYT", twitch:"NeonDuckLive", instagram:"neon.duck",
+    youtube:"NeonDuckYT", twitch:"NeonDuckLive", instagram:"neon.duck", x:"@neonduck", bluesky:"@neonduck.bsky.social",
     numXY:"12/99", setName:"Night Circuit", rarity:"rare",
     abilityName:"Overclock Aura",
     abilityText:"Once per turn, your next attack deals +20 if you changed a setting.",
@@ -55,7 +51,7 @@ export function prefillFullArt(){
   setLayout("full");
   Object.assign(state, {
     name:"Skyline Duck", nameMod:"MAX", element:"friendly", stage:"base",
-    youtube:"SkylineStreams", twitch:"SkylineDuck", instagram:"sky.duck",
+    youtube:"SkylineStreams", twitch:"SkylineDuck", instagram:"sky.duck", x:"@skylineduck", bluesky:"@skyduck.bsky.social",
     numXY:"01/45", setName:"City Lights", rarity:"ultra",
     abilityName:"City Sync",
     abilityText:"While this card is Active, your attacks cost 1 less energy if you streamed this turn.",
@@ -103,11 +99,61 @@ export function setLayout(mode){
   // BG color rows visible only in standard
   show(el("bgTopRow"), state.layout !== "full");
   show(el("bgBottomRow"), state.layout !== "full");
+  show(el("bgBorderTopRow"), state.layout !== "full");
+  show(el("bgBorderBottomRow"), state.layout !== "full");
+  show(el("bgStdRow"), state.layout !== "full");
+
 }
 
 /* Re-draw everything */
 export function drawAll(){
   drawText(); drawElement(); drawStage(); drawArt(); drawSocials();
-  drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit();
+  drawAbility(); drawAttack1(); drawAttack2(); drawFlavour(); drawCredit(); drawBgStandard();
   initTextColorSwatches();
+}
+
+
+export function prefillStandardBG(){
+  setLayout("standard");
+  Object.assign(state, {
+    name:"Cyber Duck", nameMod:"",
+    element:"busy", stage:"step2",
+    youtube:"CyberDuck", twitch:"CyberDuckLive", instagram:"cy.duck", x:"@cyberduck", bluesky:"@cy.duck",
+    numXY:"25/88", setName:"Wireframe Nights", rarity:"epic",
+    abilityName:"Latency Shield",
+    abilityText:"Reduce damage taken by 20 during your opponent's next turn.",
+    attackName:"Packet Flood", attackValue:"80",
+    attackEffect:"If you changed a setting this turn, draw 1 card.",
+    attack2Name:"Mux Surge", attack2Value:"110",
+    attack2Effect:"Discard the top card of your deck.",
+    flavour:"Streams, beams, and cyber dreams.",
+    rarityColorOverride:false,
+    rarityColor: rarityDefaultColor("epic")
+  });
+
+  // Generate a subtle background image
+  state.bgStandardURL = makeDataImage(744,1040,(ctx,w,h)=>{
+    const g=ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,'#0a0d10'); g.addColorStop(.5,'#0f2438'); g.addColorStop(1,'#1a0e12');
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    // blue lines
+    ctx.globalAlpha=.15; ctx.fillStyle='#39b8ff';
+    for(let i=0;i<55;i++) ctx.fillRect(Math.random()*w, Math.random()*h, 2, Math.random()*44+10);
+    // red lines
+    ctx.globalAlpha=.10; ctx.fillStyle='#ff3b3b';
+    for(let i=0;i<45;i++) ctx.fillRect(Math.random()*w, Math.random()*h, 2, Math.random()*36+10);
+    ctx.globalAlpha=1;
+  });
+
+  // Modifier badge as image (simple capsule)
+  state.nameModURL = makeDataImage(150,40,(ctx,w,h)=>{
+    ctx.fillStyle="#0e1419"; ctx.strokeStyle="#8cd6ff"; ctx.lineWidth=3;
+    ctx.beginPath(); const r=18;
+    ctx.moveTo(r,0); ctx.arcTo(w,0,w,h,r); ctx.arcTo(w,h,0,h,r); ctx.arcTo(0,h,0,0,r); ctx.arcTo(0,0,w,0,r); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.font="bold 20px system-ui, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillStyle="#8cd6ff";
+    ctx.fillText("SPECIAL", w/2, h/2);
+  });
+
+  drawAll();
 }

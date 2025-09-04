@@ -3,7 +3,7 @@ import { state, rarityDefaultColor } from "./state.js";
 import { drawText, drawElement, drawStage, drawArt, drawSocials,
          drawAbility, drawAttack1, drawAttack2, drawFlavour, drawCredit,
          initTextColorSwatches } from "./render.js";
-import { prefillNormal, prefillFullArt, setLayout, drawAll } from "./templates.js";
+import { prefillNormal, prefillFullArt, prefillStandardBG, setLayout, drawAll } from "./templates.js";
 import { exportCardPNGExact, exportCardPNGCompat } from "./exporter.js";
 
 /* ---------- INPUT BINDINGS ---------- */
@@ -11,6 +11,8 @@ function bindInputs(){
   const map = [
     ["name","input", v => { state.name=v; drawText(); }],
     ["nameMod","input", v => { state.nameMod=v; drawText(); }],
+    ["x","input", v => { state.x=v; drawSocials(); }],
+    ["bluesky","input", v => { state.bluesky=v; drawSocials(); }],
     ["element","change", v => { state.element=v; drawElement(); }],
     ["stage","change", v => { state.stage=v; drawStage(); }],
     ["layoutMode","change", v => { setLayout(v); }],
@@ -55,6 +57,12 @@ function bindInputs(){
   el("setIcon")?.addEventListener("change", async e => {
     state.setIconURL = await loadFileAsDataURL(e.target.files[0]); drawCredit();
   });
+  el("bgStandard")?.addEventListener("change", async e => {
+    state.bgStandardURL = await loadFileAsDataURL(e.target.files[0]); drawAll();
+  });
+  el("nameModImg")?.addEventListener("change", async e => {
+    state.nameModURL = await loadFileAsDataURL(e.target.files[0]); drawText();
+  });
 
   const wireRemove = (btnId, fileId, clearFn) => {
     const b=el(btnId), f=el(fileId);
@@ -64,9 +72,13 @@ function bindInputs(){
   wireRemove("removeMainImg","mainImg", ()=>{ state.artURL=""; drawArt(); });
   wireRemove("removePrevImg","prevImg", ()=>{ state.prevURL=""; drawStage(); });
   wireRemove("removeSetIcon","setIcon", ()=>{ state.setIconURL=""; drawCredit(); });
+  wireRemove("removeBgStandard","bgStandard", ()=>{ state.bgStandardURL=""; drawAll(); });
+  wireRemove("removeNameModImg","nameModImg", ()=>{ state.nameModURL=""; drawText(); });
   // Colors
   setupSwatch("bgTop","bgTopSwatch", updateBgColors);
   setupSwatch("bgBottom","bgBottomSwatch", updateBgColors);
+  setupSwatch("bgBorderTop","bgBorderTopSwatch", updateBgColors);
+  setupSwatch("bgBorderBottom","bgBorderBottomSwatch", updateBgColors);
   updateBgColors();
   initTextColorSwatches();
 
@@ -86,6 +98,7 @@ function bindInputs(){
   // Buttons
   el("prefillNormalBtn")?.addEventListener("click", prefillNormal);
   el("prefillFullBtn")?.addEventListener("click", prefillFullArt);
+  el("prefillStandardBgBtn")?.addEventListener("click", prefillStandardBG);
   el("resetBtn")?.addEventListener("click", resetForm);
   // Use EXACT-SIZE exporter for the Download button
   el("downloadBtn")?.addEventListener("click", () =>
@@ -96,6 +109,11 @@ function bindInputs(){
   //   exportCardPNGCompat({ fileName: (state.name || "card") + "_compat.png" })
   // );
 }
+el("toggleFrameBtn")?.addEventListener("click", () => {
+  el("card").classList.toggle("no-frame");
+});
+
+
 function setupSwatch(inputId, swatchBtnId, onChange){
   const input = el(inputId); const btn = el(swatchBtnId); if(!input||!btn) return;
   const box = btn.querySelector('.swatch');
@@ -107,9 +125,13 @@ function setupSwatch(inputId, swatchBtnId, onChange){
 }function updateBgColors(){
   const top = el("bgTop").value || "#0a0d10";
   const bottom = el("bgBottom").value || "#0b0f12";
+  const top_border = el("bgBorderTop").value || "#9a9a9a";
+  const bottom_border = el("bgBorderBottom").value || "#4b4b4b";
   const card = el("card");
   card.style.setProperty("--bg-top", top);
   card.style.setProperty("--bg-bottom", bottom);
+  card.style.setProperty("--bg-top-border", top_border);
+  card.style.setProperty("--bg-bottom-border", bottom_border);
 }
 
 /* ---- Color swatch helper for rarity ---- */

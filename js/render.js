@@ -6,8 +6,18 @@ import { state, rarityDefaultColor } from "./state.js";
 export function drawText(){
   el("titleName").textContent = state.name || " ";
   const mod = el("titleMod");
-  mod.textContent = state.nameMod || "";
-  mod.style.display = state.nameMod ? "inline-flex" : "none";
+  const modImg = el("titleModImg");
+  // Prefer image if provided
+  if(state.nameModURL){
+    mod.style.display = "none";
+    modImg.src = state.nameModURL;
+    modImg.style.display = "inline-block";
+  } else {
+    mod.textContent = state.nameMod || "";
+    mod.style.display = state.nameMod ? "inline-flex" : "none";
+    modImg.removeAttribute("src");
+    modImg.style.display = "none";
+  }
 }
 
 export function drawElement(){
@@ -33,7 +43,7 @@ export function drawArt(){
 }
 
 export function drawSocials(){
-  const pairs = [["ytName",state.youtube],["twName",state.twitch],["igName",state.instagram]];
+  const pairs = [["ytName",state.youtube],["twName",state.twitch],["igName",state.instagram],["xName",state.x],["bsName",state.bluesky]];
   let any = false;
   pairs.forEach(([id,val])=>{
     const n = el(id);
@@ -117,7 +127,7 @@ const colorTargets = [
   ["c_attackName","#attackTitle"], ["c_attackValue","#attackVal"], ["c_attackEffect","#attackEffectText"],
   ["c_attack2Name","#attack2Title"], ["c_attack2Value","#attack2Val"], ["c_attack2Effect","#attack2EffectText"],
   ["c_flavour","#flavourText"], ["c_numXY","#numOut"], ["c_setName","#setNameText"],
-  ["c_social_yt","#ytName"], ["c_social_tw","#twName"], ["c_social_ig","#igName"]
+  ["c_social_yt","#ytName"], ["c_social_tw","#twName"], ["c_social_ig","#igName"], ["c_social_x","#xName"], ["c_social_bs","#bsName"]
 ];
 
 export function initTextColorSwatches(){
@@ -138,4 +148,16 @@ export function initTextColorSwatches(){
       target.style.color = v;
     });
   });
+}
+
+
+export function drawBgStandard(){
+  const img = el("bgStandardImg");
+  if (state.layout === "standard" && state.bgStandardURL){
+    img.src = state.bgStandardURL;
+    img.style.display = "block";
+  } else {
+    img.removeAttribute("src");
+    img.style.display = "none";
+  }
 }

@@ -2,13 +2,13 @@
 export const state = {
   name: "", nameMod: "",
   element: "calm", stage: "base", layout: "standard",
-  youtube: "", twitch: "", instagram: "",
+  youtube: "", twitch: "", instagram: "", x: "", bluesky: "",
   abilityName: "", abilityText: "",
   attackName: "", attackValue: "", attackEffect: "",
   attack2Name: "", attack2Value: "", attack2Effect: "",
   flavour: "", numXY: "", setName: "",
   rarity: "common",
-  artURL: "", prevURL: "", setIconURL: "",
+  artURL: "", prevURL: "", setIconURL: "", bgStandardURL: "", nameModURL: "",
   rarityColorOverride: false,
   rarityColor: "#c9c9c9"
 };

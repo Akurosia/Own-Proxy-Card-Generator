@@ -89,23 +89,53 @@
           </select>
         </div>
 
-        <!-- BG top (only when not full art) -->
-        <div class="form-row row-2" id="bgTopRow">
-          <div class="lab">BG Top</div>
-          <div class="color-input solo">
-            <button id="bgTopSwatch" class="swatch-btn" type="button"><span class="swatch"></span></button>
-            <input id="bgTop" class="hidden-color" type="color" value="#0a0d10"/>
+        <div class="form-row row-2" id="bgRow">
+          <!-- BG top (only when not full art) -->
+          <div class="form-row row-2" id="bgTopRow">
+            <div class="lab">BG Top</div>
+            <div class="color-input solo">
+              <button id="bgTopSwatch" class="swatch-btn" type="button"><span class="swatch"></span></button>
+              <input id="bgTop" class="hidden-color" type="color" value="#0a0d10"/>
+            </div>
+          </div>
+          <!-- BG bottom (only when not full art) -->
+          <div class="form-row row-2" id="bgBottomRow" style="margin-left: 38%;width: fit-content;">
+            <div class="lab">BG Bottom</div>
+            <div class="color-input solo">
+              <button id="bgBottomSwatch" class="swatch-btn" type="button"><span class="swatch"></span></button>
+              <input id="bgBottom" class="hidden-color" type="color" value="#0b0f12"/>
+            </div>
           </div>
         </div>
 
-        <!-- BG bottom (only when not full art) -->
-        <div class="form-row row-2" id="bgBottomRow">
-          <div class="lab">BG Bottom</div>
-          <div class="color-input solo">
-            <button id="bgBottomSwatch" class="swatch-btn" type="button"><span class="swatch"></span></button>
-            <input id="bgBottom" class="hidden-color" type="color" value="#0b0f12"/>
+        <div class="form-row row-2" id="bgBorderRow">
+          <!-- BG top (only when not full art) -->
+          <div class="form-row row-2" id="bgBorderTopRow">
+            <div class="lab">BG Border Top</div>
+            <div class="color-input solo">
+              <button id="bgBorderTopSwatch" class="swatch-btn" type="button"><span class="swatch"></span></button>
+              <input id="bgBorderTop" class="hidden-color" type="color" value="#9a9a9a"/>
+            </div>
+          </div>
+          <!-- BG bottom (only when not full art) -->
+          <div class="form-row row-2" id="bgBorderBottomRow" style="margin-left: 38%;width: fit-content;">
+            <div class="lab">BG Border Bottom</div>
+            <div class="color-input solo">
+              <button id="bgBorderBottomSwatch" class="swatch-btn" type="button"><span class="swatch"></span></button>
+              <input id="bgBorderBottom" class="hidden-color" type="color" value="#4b4b4b"/>
+            </div>
           </div>
         </div>
+        <!-- Background (Standard layout only) -->
+        <div class="form-row row-3" id="bgStdRow">
+          <div class="lab">Background (Standard)</div>
+          <input id="bgStandard" type="file" accept="image/*"/>
+          <button id="removeBgStandard" class="remove-btn" type="button" title="Remove background">
+            <span class="x">×</span>
+          </button>
+        </div>
+        <button id="toggleFrameBtn" type="button">Toggle Frame</button>
+
 
         <!-- Socials -->
         <fieldset class="socials col2">
@@ -134,7 +164,23 @@
             <button id="c_social_igSw" class="swatch-btn" type="button" title="Instagram text color"><span class="swatch"></span></button>
             <input id="c_social_ig" class="hidden-color" type="color" value="#b7ccde"/>
           </div>
-        </fieldset>
+
+          <div class="social-row row-4">
+            <img class="icon-sm" src="assets/x.svg" alt="X">
+            <div class="lab">X</div>
+            <input id="x" type="text" placeholder="Handle"/>
+            <button id="c_social_xSw" class="swatch-btn" type="button" title="X text color"><span class="swatch"></span></button>
+            <input id="c_social_x" class="hidden-color" type="color" value="#b7ccde"/>
+          </div>
+
+          <div class="social-row row-4">
+            <img class="icon-sm" src="assets/bluesky.svg" alt="BlueSky">
+            <div class="lab">BlueSky</div>
+            <input id="bluesky" type="text" placeholder="@handle.bsky.social"/>
+            <button id="c_social_bsSw" class="swatch-btn" type="button" title="BlueSky text color"><span class="swatch"></span></button>
+            <input id="c_social_bs" class="hidden-color" type="color" value="#b7ccde"/>
+          </div>
+    </fieldset>
 
       </div>
     </aside>
@@ -144,6 +190,7 @@
       <div class="card-viewport">
         <div class="card" id="card">
           <div class="card-inner"></div>
+          <img id="bgStandardImg" class="bg-standard" alt="" style="display:none"/>
 
           <div class="frame">
             <div class="frame-corner tl"></div>
@@ -157,6 +204,7 @@
             <div class="title">
               <span id="titleName"> </span>
               <span id="titleMod"></span>
+              <img id="titleModImg" class="title-mod-img" alt="" style="display:none"/>
             </div>
             <div class="stage">
               <span id="stageText">Base</span>
@@ -176,6 +224,12 @@
             </div>
             <div class="socialItem">
               <img class="icon" src="assets/instagram.svg" alt="Instagram"><span id="igName"></span>
+            </div>
+            <div class="socialItem">
+              <img class="icon" src="assets/x.svg" alt="X"><span id="xName"></span>
+            </div>
+            <div class="socialItem">
+              <img class="icon" src="assets/bluesky.svg" alt="BlueSky"><span id="bsName"></span>
             </div>
           </div>
 
@@ -222,6 +276,7 @@
       <div class="buttons-center">
         <button id="prefillNormalBtn" type="button">Demo (Standard)</button>
         <button id="prefillFullBtn" type="button">Demo (Full Art)</button>
+        <button id="prefillStandardBgBtn" type="button">Demo (Standard BG)</button>
         <button id="resetBtn" type="button">Reset</button>
         <button id="downloadBtn" type="button">Download PNG</button>
         <span class="exportNote">Tip: host assets/*.svg to avoid CORS issues for exports.</span>
