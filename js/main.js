@@ -154,13 +154,13 @@ function resetForm(){
     name:"", nameMod:"", element: el("element")?.value || "calm",
     stage: el("stage")?.value || "base",
     layout: el("layoutMode")?.value || "standard",
-    youtube:"", twitch:"", instagram:"",
+    youtube:"", twitch:"", instagram:"", x:"", bluesky:"",
     abilityName:"", abilityText:"",
     attackName:"", attackValue:"", attackEffect:"",
     attack2Name:"", attack2Value:"", attack2Effect:"",
     flavour:"", numXY:"", setName:"",
     rarity: el("rarity")?.value || "common",
-    artURL:"", prevURL:"", setIconURL:"",
+    artURL:"", prevURL:"", setIconURL:"", bgStandardURL: "", nameModURL: "",
     rarityColorOverride:false,
     rarityColor: rarityDefaultColor(el("rarity")?.value || "common")
   });
