@@ -11,8 +11,6 @@ function bindInputs(){
   const map = [
     ["name","input", v => { state.name=v; drawText(); }],
     ["nameMod","input", v => { state.nameMod=v; drawText(); }],
-    ["x","input", v => { state.x=v; drawSocials(); }],
-    ["bluesky","input", v => { state.bluesky=v; drawSocials(); }],
     ["element","change", v => { state.element=v; drawElement(); }],
     ["stage","change", v => { state.stage=v; drawStage(); }],
     ["layoutMode","change", v => { setLayout(v); }],
@@ -20,6 +18,8 @@ function bindInputs(){
     ["youtube","input", v => { state.youtube=v; drawSocials(); }],
     ["twitch","input", v => { state.twitch=v; drawSocials(); }],
     ["instagram","input", v => { state.instagram=v; drawSocials(); }],
+    ["x","input", v => { state.x=v; drawSocials(); }],
+    ["bluesky","input", v => { state.bluesky=v; drawSocials(); }],
 
     ["abilityName","input", v => { state.abilityName=v; drawAbility(); }],
     ["abilityText","input", v => { state.abilityText=v; drawAbility(); }],

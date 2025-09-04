@@ -23,7 +23,7 @@ export function prefillNormal(){
   });
 
   // mirror into inputs
-  ["name","nameMod","element","stage","youtube","twitch","instagram","numXY","setName","rarity",
+  ["name","nameMod","element","stage","youtube","twitch","instagram","x","bluesky","numXY","setName","rarity",
    "abilityName","abilityText","attackName","attackValue","attackEffect","attack2Name","attack2Value","attack2Effect","flavour"]
    .forEach(id => el(id) && (el(id).value = state[id] ?? ""));
 
@@ -64,7 +64,7 @@ export function prefillFullArt(){
     rarityColor: rarityDefaultColor("ultra")
   });
 
-  ["name","nameMod","element","stage","youtube","twitch","instagram","numXY","setName","rarity",
+  ["name","nameMod","element","stage","youtube","twitch","instagram","x","bluesky","numXY","setName","rarity",
    "abilityName","abilityText","attackName","attackValue","attackEffect","attack2Name","attack2Value","attack2Effect","flavour"]
    .forEach(id => el(id) && (el(id).value = state[id] ?? ""));
 
@@ -130,6 +130,9 @@ export function prefillStandardBG(){
     rarityColorOverride:false,
     rarityColor: rarityDefaultColor("epic")
   });
+  ["name","nameMod","element","stage","youtube","twitch","instagram","x","bluesky","numXY","setName","rarity",
+   "abilityName","abilityText","attackName","attackValue","attackEffect","attack2Name","attack2Value","attack2Effect","flavour"]
+   .forEach(id => el(id) && (el(id).value = state[id] ?? ""));
 
   // Generate a subtle background image
   state.bgStandardURL = makeDataImage(744,1040,(ctx,w,h)=>{
