@@ -66,6 +66,8 @@ function bindInputs(){
   // Colors
   setupSwatch("bgTop","bgTopSwatch", updateBgColors);
   setupSwatch("bgBottom","bgBottomSwatch", updateBgColors);
+  setupSwatch("bgBorderTop","bgBorderTopSwatch", updateBgColors);
+  setupSwatch("bgBorderBottom","bgBorderBottomSwatch", updateBgColors);
   updateBgColors();
   initTextColorSwatches();
 
@@ -116,6 +118,8 @@ const textColorMap = [
   ["c_social_yt","c_social_ytSw","#ytName"],
   ["c_social_tw","c_social_twSw","#twName"],
   ["c_social_ig","c_social_igSw","#igName"],
+  ["c_social_x","c_social_xSw","#xName"],
+  ["c_social_bs","c_social_bsSw","#bsName"],
 ];
 function initTextColorSwatches(){
   textColorMap.forEach(([i, s, sel])=>{
@@ -146,6 +150,8 @@ function setLayout(mode){
   const sel = el("layoutMode"); if (sel && sel.value !== state.layout) sel.value = state.layout;
   show(el("bgTopRow"), state.layout !== "full");
   show(el("bgBottomRow"), state.layout !== "full");
+  show(el("bgBorderTopRow"), state.layout !== "full");
+  show(el("bgBorderBottomRow"), state.layout !== "full");
 }
 
 function drawStage(){
@@ -159,7 +165,7 @@ function drawText(){ el("titleName").textContent = state.name || " "; const m=el
 function drawElement(){ const b=el("elementBadge"); b.textContent=(state.element||"").toUpperCase(); b.className="badge element "+state.element; }
 function drawArt(){ const img=el("artImg"); if(state.artURL){ img.src=state.artURL; img.style.display="block"; } else { img.removeAttribute("src"); img.style.display="none"; } }
 function drawSocials(){
-  const pairs=[["ytName",state.youtube],["twName",state.twitch],["igName",state.instagram]];
+  const pairs=[["ytName",state.youtube],["twName",state.twitch],["igName",state.instagram],["bsName",state.bluesky]];
   let any=false;
   pairs.forEach(([id,val])=>{ const n=el(id); n.textContent=val||""; const showRow=!!(val && val.trim()); n.parentElement.style.display=showRow?"flex":"none"; if(showRow) any=true; });
   document.querySelector(".card-socials").style.display = any ? "flex" : "none";
