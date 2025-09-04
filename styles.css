@@ -3,7 +3,8 @@
 
 :root{
   --bg:#0b0f12; --panel:#12171c; --ink:#d4e1ee; --muted:#8ea0b2; --line:#1c232b;
-  --blue:#39b8ff; --red:#ff3b3b;
+  --blue: #007bdd;
+  --red:  #e30017;
 
   /* Card base (export size) — REMEMBERED */
   --card-w:744px;
