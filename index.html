@@ -47,6 +47,18 @@
           </button>
           <input id="c_nameMod" class="hidden-color" type="color" value="#8cd6ff"/>
         </div>
+        <div class="form-row row-3">
+          <div class="lab">Name Modifier Image</div>
+          <input id="nameModImg" type="file" accept="image/*"/>
+          <button id="removeNameModImg" class="remove-btn" type="button" title="Remove modifier image">
+            <span class="x">×</span>
+          </button>
+        </div>
+        <div class="form-row row-3">
+          <div class="lab">Art Scale</div>
+          <input id="artScale" type="range" min="1" max="5" step="0.01" value="1">
+          <input id="artScaleNum" type="number" min="1" max="5" step="0.01" value="1" style="width:56px">
+        </div>
 
         <!-- Element + color -->
         <div class="form-row row-3">
@@ -86,6 +98,7 @@
           </button>
         </div>
 
+        <hr style="width: 100%;">
         <!-- Main image + remove -->
         <div class="form-row row-3">
           <div class="lab">Main Image</div>
@@ -104,6 +117,7 @@
           </select>
         </div>
 
+        <hr style="width: 100%;">
         <div class="form-row row-2" id="bgRow">
           <!-- BG top (only when not full art) -->
           <div class="form-row row-2" id="bgTopRow">
@@ -152,6 +166,7 @@
         <button id="toggleFrameBtn" type="button">Toggle Frame</button>
 
 
+        <hr style="width: 100%;">
         <!-- Socials -->
         <fieldset class="socials col2">
           <legend>Socials</legend>
@@ -160,31 +175,31 @@
             <img class="icon-sm" src="assets/youtube.svg" alt="YouTube">
             <div class="lab">YouTube</div>
             <input id="youtube" type="text" placeholder="Channel name"/>
-            <button id="c_social_ytSw" class="swatch-btn" type="button" title="YouTube text color"><span class="swatch"></span></button>
-            <input id="c_social_yt" class="hidden-color" type="color" value="#b7ccde"/>
+            <button id="c_social_ytSw" class="swatch-btn" type="button" title="YouTube text color"><span class="swatch" style="background: #ad0000;"></span></button>
+            <input id="c_social_yt" class="hidden-color" type="color" value="#ad0000"/>
           </div>
 
           <div class="social-row row-4">
             <img class="icon-sm" src="assets/twitch.svg" alt="Twitch">
             <div class="lab">Twitch</div>
             <input id="twitch" type="text" placeholder="Channel name"/>
-            <button id="c_social_twSw" class="swatch-btn" type="button" title="Twitch text color"><span class="swatch"></span></button>
-            <input id="c_social_tw" class="hidden-color" type="color" value="#b7ccde"/>
+            <button id="c_social_twSw" class="swatch-btn" type="button" title="Twitch text color"><span class="swatch" style="background: #a600ff;"></span></button>
+            <input id="c_social_tw" class="hidden-color" type="color" value="#a600ff"/>
           </div>
 
           <div class="social-row row-4">
             <img class="icon-sm" src="assets/instagram.svg" alt="Instagram">
             <div class="lab">Instagram</div>
             <input id="instagram" type="text" placeholder="@handle"/>
-            <button id="c_social_igSw" class="swatch-btn" type="button" title="Instagram text color"><span class="swatch"></span></button>
-            <input id="c_social_ig" class="hidden-color" type="color" value="#b7ccde"/>
+            <button id="c_social_igSw" class="swatch-btn" type="button" title="Instagram text color"><span class="swatch" style="background: #e600a8;"></span></button>
+            <input id="c_social_ig" class="hidden-color" type="color" value="#e600a8"/>
           </div>
 
           <div class="social-row row-4">
             <img class="icon-sm" src="assets/x.svg" alt="X">
             <div class="lab">X</div>
             <input id="x" type="text" placeholder="Handle"/>
-            <button id="c_social_xSw" class="swatch-btn" type="button" title="X text color"><span class="swatch"></span></button>
+            <button id="c_social_xSw" class="swatch-btn" type="button" title="X text color"><span class="swatch" style="background: #b7ccde;"></span></button>
             <input id="c_social_x" class="hidden-color" type="color" value="#b7ccde"/>
           </div>
 
@@ -192,8 +207,8 @@
             <img class="icon-sm" src="assets/bluesky.svg" alt="BlueSky">
             <div class="lab">BlueSky</div>
             <input id="bluesky" type="text" placeholder="@handle.bsky.social"/>
-            <button id="c_social_bsSw" class="swatch-btn" type="button" title="BlueSky text color"><span class="swatch"></span></button>
-            <input id="c_social_bs" class="hidden-color" type="color" value="#b7ccde"/>
+            <button id="c_social_bsSw" class="swatch-btn" type="button" title="BlueSky text color"><span class="swatch" style="background: #0085ff;"></span></button>
+            <input id="c_social_bs" class="hidden-color" type="color" value="#0085ff"/>
           </div>
     </fieldset>
 
@@ -219,7 +234,7 @@
             <div class="title">
               <span id="titleName"> </span>
               <span id="titleMod"></span>
-              <img id="titleModImg" class="title-mod-img" alt="" style="display:none"/>
+              <img id="titleModImg" class="title-mod-img" alt="" style=""/>
             </div>
             <div class="stage">
               <span id="stageText">Base</span>
@@ -250,7 +265,7 @@
 
           <section class="card-ability">
             <div class="aa-head">
-              <span class="ability-flag">Ability</span>
+              <span class="ability-flag">Fähigkeit</span>
               <span class="aa-title" id="abilityTitle"></span>
             </div>
             <p id="abilityDesc"></p>
@@ -318,7 +333,7 @@
           <button id="c_abilityTextSw" class="swatch-btn" type="button" title="Ability text color"><span class="swatch"></span></button>
           <input id="c_abilityText" class="hidden-color" type="color" value="#b1c6d9"/>
         </div>
-
+        <hr style="width: 100%;">
         <!-- Attack 1 -->
         <div class="form-row row-3">
           <div class="lab">Attack 1 Name</div>
@@ -355,6 +370,7 @@
           <input id="c_attack2Effect" class="hidden-color" type="color" value="#b1c6d9"/>
         </div>
 
+        <hr style="width: 100%;">
         <!-- Flavour -->
         <div class="form-row row-3">
           <div class="lab">Flavour Text</div>
@@ -363,6 +379,7 @@
           <input id="c_flavour" class="hidden-color" type="color" value="#b1c6d9"/>
         </div>
 
+        <hr style="width: 100%;">
         <!-- Footer -->
         <div class="form-row row-3">
           <div class="lab">Set Icon</div>
@@ -386,6 +403,7 @@
         <div class="form-row row-3">
           <div class="lab">Rarity</div>
           <select id="rarity">
+            <option value="none">Ohne</option>
             <option value="common">Common</option>
             <option value="uncommon">Uncommon</option>
             <option value="rare">Rare</option>

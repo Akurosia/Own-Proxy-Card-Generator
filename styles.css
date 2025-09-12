@@ -13,7 +13,7 @@
   --panel-w-r: 320px;
   --panel-w-l: 510px;
 
-  --radius-lg:28px; --radius-md:18px; --radius-sm:10px;
+  --radius-lg:30px; --radius-md:20px; --radius-sm:10px;
   --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-7:28px; --s-8:32px;
   --shadow-outer:0 10px 30px rgba(0,0,0,.45);
   --shadow-inset:inset 0 0 0 1px #0f151a;
@@ -103,13 +103,13 @@ button:hover{border-color:#293544}
 
 /* Decorative inner (kept inside the frame) */
 .card-inner{
-  height: 94%;
-  position:absolute;inset:30px;border-radius:20px;z-index:0;
+  height: 96%;
+  position:absolute;inset:20px;border-radius:20px;z-index:0;
   background: linear-gradient(180deg, var(--bg-top, #0a0d10), var(--bg-bottom, #0b0f12));
 }
 
 /* Corners / frame (30px inset) */
-.frame{position:absolute;inset:30px;z-index:1;pointer-events:none}
+.frame{position:absolute;inset:20px;z-index:1;pointer-events:none}
 .frame-corner{position:absolute;width:60px;height:60px}
 .frame-corner::before{content:"";position:absolute;inset:0;border:2px solid;background:transparent}
 .frame-corner.tl{top:0;left:0}.frame-corner.tl::before{border-color:var(--red) transparent transparent var(--red);border-radius:18px 0 0 0}
@@ -119,7 +119,7 @@ button:hover{border-color:#293544}
 
 /* Header (no bottom border) */
 .card-head{
-  position:relative;z-index:2;display:grid;grid-template-columns:90px 1fr 90px;align-items:center;
+  position:relative;z-index:3;display:grid;grid-template-columns:90px 1fr 90px;align-items:center;
   padding:40px 45px 15px;border-bottom:0;
 }
 .badge.element{
@@ -127,7 +127,7 @@ button:hover{border-color:#293544}
   font:700 13px var(--font-display);text-transform:uppercase;
   margin:auto; /* NEW: center the badge within its grid cell */
 }
-.title{display:flex;gap:8px;justify-content:center}
+.title{display:flex;gap:8px;justify-content:center;align-items: center;}
 #titleName{font:700 28px var(--font-display);color:#cfe8ff}
 #titleMod{font:800 22px var(--font-display);padding:2px 8px;border:1px solid #182029;border-radius:8px;background:#0e1419;color:#8cd6ff}
 #titleMod:empty{display:none}
@@ -140,7 +140,7 @@ button:hover{border-color:#293544}
 .stage img{display:none;width:40px;height:40px;border-radius:8px}
 
 /* Art & sections — keep 30px side margins */
-.card-art{position:relative;z-index:2;position:relative;z-index:1;margin:8px 45px 0;height:500px;border-radius:var(--radius-md);overflow:hidden;border:1px solid #141b22;background:#0f1317}
+.card-art{position:relative;z-index:2;position:relative;margin:8px 45px 0;height:500px;border-radius:var(--radius-md);overflow:hidden;border:1px solid #141b22;background:#0f1317}
 .card-art img{width:100%;height:100%;object-fit:cover}
 .art-spacer{display:none}
 
@@ -150,7 +150,7 @@ button:hover{border-color:#293544}
   display:flex;justify-content:center;align-items:center;gap:16px;
   margin:12px 45px 0;padding:8px 10px;border:1px solid #141b22;border-radius:12px;background:#0f14196A
 }
-.socialItem{display:flex;align-items:center;gap:8px;color:#b7ccde;font:700 12px var(--font-display)}
+.socialItem{display:flex;align-items:center;gap:8px;color:#b7ccde;font:700 13px var(--font-display)}
 .socialItem span:empty{display:none}
 .socialItem .icon{display:block;width:18px;height:18px}
 
@@ -186,7 +186,7 @@ button:hover{border-color:#293544}
 .card-credit .credit-right{display:flex;align-items:center;gap:10px;justify-self:end}
 .card-credit .credit-right #numOut{color:#cfe4ff;font:700 12px var(--font-display)}
 .card-credit .credit-right .rarity svg{width:18px;height:18px}
-.card-credit .credit-center{ position:absolute; left:50%; transform:translateX(-50%); white-space:nowrap; text-align:center; pointer-events:none; color:#8ea0b2 }
+.card-credit .credit-center{ position:absolute; left:50%; transform:translateX(-50%); white-space:nowrap; text-align:center; pointer-events:none; margin-top: 95px;color:#8ea0b2 }
 
 /* Full Art variant */
 .card.fullart .card-inner{display:none;}
@@ -218,10 +218,10 @@ button:hover{border-color:#293544}
 /* Background image for Standard layout */
 .bg-standard{
   position:absolute;
-  inset:30px;
-  width: 92%;
-  height: 94%;
-  left:30px; right:30px; top:30px; bottom:30px;
+  inset:20px;
+  width: 94%;
+  height: 96%;
+  left:20px; right:20px; top:20px; bottom:20px;
   object-fit: cover;
   border-radius:20px;
   pointer-events:none;
@@ -229,16 +229,12 @@ button:hover{border-color:#293544}
   opacity: 0.9;
   z-index: 2;
 }
-.card .card-inner{ position:absolute; inset:30px; border-radius:20px; z-index: 1; }
-.card .card-head, .card .card-socials, .card .card-ability, .card .card-attack, .card .card-flavour, .card .card-credit, .card .card-art { z-index:2; }
+.card .card-inner{ position:absolute; inset:20px; border-radius:20px; z-index: 1; }
 .card .frame{ z-index:2; }
 
 /* Title modifier image */
 .title-mod-img{
-  display:inline-block;
   height: 24px;
-  vertical-align: middle;
-  margin-left: 6px;
 }
 @media (min-width: 800px){
   .title-mod-img{ height: 28px; }
@@ -289,3 +285,18 @@ button:hover{border-color:#293544}
 
 /* -------------------- Footer -------------------- */
 .site-footer{ border-top:1px solid #111820; padding:18px 0; color:var(--muted); }
+
+
+#titleModImg{
+  display:inline-block;
+  height:24px;                  /* keep its layout box small */
+  vertical-align:middle;
+  transform: scale(var(--name-mod-scale, 1));
+  transform-origin:left center;
+  position:relative;            /* let it overlay if it grows */
+  z-index:3;                    /* above neighbors */
+  pointer-events:none;          /* avoid blocking clicks */
+}
+@media (min-width: 800px){
+  #titleModImg{ height:28px; }
+}

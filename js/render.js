@@ -5,19 +5,20 @@ import { state, rarityDefaultColor } from "./state.js";
 
 export function drawText(){
   el("titleName").textContent = state.name || " ";
-  const mod = el("titleMod");
+
+  const mod    = el("titleMod");
   const modImg = el("titleModImg");
-  // Prefer image if provided
-  if(state.nameModURL){
-    mod.style.display = "none";
+
+  if (state.nameModURL){
     modImg.src = state.nameModURL;
     modImg.style.display = "inline-block";
+    modImg.style.setProperty("--name-mod-scale", String(state.nameModScale || 1));
   } else {
-    mod.textContent = state.nameMod || "";
-    mod.style.display = state.nameMod ? "inline-flex" : "none";
     modImg.removeAttribute("src");
     modImg.style.display = "none";
   }
+  mod.textContent = state.nameMod || "";
+  mod.style.display = state.nameMod ? "inline-flex" : "none";
 }
 
 export function drawElement(){
@@ -103,6 +104,7 @@ export function drawCredit(){
   const ic = el("rarityIcon");
   let svg="";
   switch(r){
+    case "none":     svg=''; break;
     case "common":   svg='<circle cx="12" cy="12" r="7.5"/>'; break;
     case "uncommon": svg='<path d="M12 3l7 9-7 9-7-9 7-9z"/>'; break;
     case "rare":     svg='<path d="M12 2.5l3.1 6.3 7 1-5.1 5 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5.1-5 7-1L12 2.5z"/>'; break;
@@ -136,10 +138,11 @@ export function initTextColorSwatches(){
     const target = $(targetSel);
     const btn = el(inputId+"Sw");
     if(!input || !target || !btn) return;
-
-    const cur = toHex(getComputedStyle(target).color);
-    input.value = cur;
-    btn.querySelector(".swatch").style.background = cur;
+    if (!input.value){
+      const cur = toHex(getComputedStyle(target).color);
+      input.value = cur;
+    }
+    btn.querySelector(".swatch").style.background = input.value;
 
     btn.addEventListener("click", ()=> input.click());
     input.addEventListener("input", ()=>{
@@ -147,6 +150,7 @@ export function initTextColorSwatches(){
       btn.querySelector(".swatch").style.background = v;
       target.style.color = v;
     });
+    target.style.color = input.value;
   });
 }
 

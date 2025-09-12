@@ -147,7 +147,12 @@ export function prefillStandardBG(){
     for(let i=0;i<45;i++) ctx.fillRect(Math.random()*w, Math.random()*h, 2, Math.random()*36+10);
     ctx.globalAlpha=1;
   });
-
+  state.artURL = makeDataImage(1200,800,(ctx,w,h)=>{
+    const g=ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'#0a0d10'); g.addColorStop(1,'#243f66');
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    ctx.globalAlpha=.25; ctx.strokeStyle='#39b8ff'; ctx.lineWidth=40;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w,h); ctx.moveTo(w,0); ctx.lineTo(0,h); ctx.stroke(); ctx.globalAlpha=1;
+  });
   // Modifier badge as image (simple capsule)
   state.nameModURL = makeDataImage(150,40,(ctx,w,h)=>{
     ctx.fillStyle="#0e1419"; ctx.strokeStyle="#8cd6ff"; ctx.lineWidth=3;

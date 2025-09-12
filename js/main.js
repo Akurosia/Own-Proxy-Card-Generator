@@ -73,7 +73,7 @@ function bindInputs(){
   wireRemove("removePrevImg","prevImg", ()=>{ state.prevURL=""; drawStage(); });
   wireRemove("removeSetIcon","setIcon", ()=>{ state.setIconURL=""; drawCredit(); });
   wireRemove("removeBgStandard","bgStandard", ()=>{ state.bgStandardURL=""; drawAll(); });
-  wireRemove("removeNameModImg","nameModImg", ()=>{ state.nameModURL=""; drawText(); });
+  wireRemove("removeNameModImg","titleModImg", ()=>{ state.nameModURL=""; drawText(); });
   // Colors
   setupSwatch("bgTop","bgTopSwatch", updateBgColors);
   setupSwatch("bgBottom","bgBottomSwatch", updateBgColors);
@@ -104,10 +104,6 @@ function bindInputs(){
   el("downloadBtn")?.addEventListener("click", () =>
     exportCardPNGExact({ fileName: (state.name || "card") + ".png" })
   );
-  // (Optional) If you add another button with id="downloadCompatBtn", wire it like:
-  // el("downloadCompatBtn")?.addEventListener("click", () =>
-  //   exportCardPNGCompat({ fileName: (state.name || "card") + "_compat.png" })
-  // );
 }
 el("toggleFrameBtn")?.addEventListener("click", () => {
   el("card").classList.toggle("no-frame");
@@ -121,8 +117,9 @@ function setupSwatch(inputId, swatchBtnId, onChange){
   btn.addEventListener('click', ()=> input.click());
   input.addEventListener('input', sync);
   if(box) box.style.background = input.value || "#000";
+}
 
-}function updateBgColors(){
+function updateBgColors(){
   const top = el("bgTop").value || "#0a0d10";
   const bottom = el("bgBottom").value || "#0b0f12";
   const top_border = el("bgBorderTop").value || "#9a9a9a";
@@ -160,6 +157,7 @@ function resetForm(){
     attack2Name:"", attack2Value:"", attack2Effect:"",
     flavour:"", numXY:"", setName:"",
     rarity: el("rarity")?.value || "common",
+    artScale: 1,   // <— new
     artURL:"", prevURL:"", setIconURL:"", bgStandardURL: "", nameModURL: "",
     rarityColorOverride:false,
     rarityColor: rarityDefaultColor(el("rarity")?.value || "common")
@@ -170,6 +168,26 @@ function resetForm(){
   syncRarityColorSwatch();
 }
 
+// Hook Art Scale controls to scale the Name Modifier Image
+const syncNameModScaleUI = (v) => {
+  const s = String(v);
+  const r = el("artScale");     if (r) r.value = s;
+  const n = el("artScaleNum");  if (n) n.value = s;
+};
+const setNameModScale = (v) => {
+  let s = parseFloat(v);
+  if (!isFinite(s)) s = 1;
+  s = Math.max(1, Math.min(5, s)); // keep within slider range
+  state.nameModScale = s;
+  syncNameModScaleUI(s);
+  drawText();
+};
+
+el("artScale")?.addEventListener("input", (e) => setNameModScale(e.target.value));
+el("artScaleNum")?.addEventListener("input", (e) => setNameModScale(e.target.value));
+
+// Optional: initialize UI from state on load
+syncNameModScaleUI(state.nameModScale || 1);
 /* ---- Bootstrap ---- */
 bindInputs();
 setLayout("standard");
